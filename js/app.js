@@ -201,7 +201,7 @@ const tabelasPontuacao = {
                 '90': '19:28',
                 '100': '18:24'
             },
-            '49a49': {
+            '46a49': {
                 '50': '24:32',
                 '60': '23:44',
                 '70': '22:56',
@@ -507,6 +507,132 @@ function obterFaixaEtaria(idade, atividade) {
     }
 }
 
+// Função para preencher tabela de notas
+function preencherTabelaNotas(atividade, idade, sexo) {
+    const faixaEtaria = obterFaixaEtaria(idade, atividade);
+    const tabela = tabelasPontuacao[atividade];
+    const sexoTabela = sexo === 'M' ? 'masculino' : 'feminino';
+
+    if (!tabela || !tabela[sexoTabela] || !tabela[sexoTabela][faixaEtaria]) {
+        console.warn('Tabela não encontrada para atividade:', atividade, 'sexo:', sexo, 'faixa:', faixaEtaria);
+        return;
+    }
+
+    const pontosFaixa = tabela[sexoTabela][faixaEtaria];
+    const tbody = document.getElementById('tabelaNotas');
+    if (!tbody) return;
+
+    // Limpar tabela
+    tbody.innerHTML = '';
+
+    // Obter distância para cálculo do pace
+    const distancias = {
+        'corrida2400': 2.4,
+        'corrida3200': 3.2,
+        'natacao50': 0.05,
+        'natacao100': 0.1,
+        'caminhada4800': 4.8
+    };
+    const distancia = distancias[atividade] || 1;
+
+    // Preencher com todas as notas (100-50 com incremento de -1)
+    const notas = [];
+    for (let nota = 100; nota >= 50; nota--) {
+        notas.push(nota);
+    }
+    
+    for (const nota of notas) {
+        let tempo = '--';
+        let pace = '--';
+        
+        if (pontosFaixa[nota]) {
+            // Nota existe diretamente na tabela
+            tempo = pontosFaixa[nota];
+            const tempoSegundos = tempoStringParaSegundos(tempo);
+            
+            // Calcular pace
+            if (atividade === 'natacao50' || atividade === 'natacao100') {
+                // Para natação: pace por 100m
+                const distanciaMetros = atividade === 'natacao50' ? 50 : 100;
+                const pacePor100m = (tempoSegundos / distanciaMetros) * 100;
+                pace = segundosParaMMSS(pacePor100m) + ' /100m';
+            } else {
+                // Para corrida/caminhada: pace por km
+                const paceSegundos = tempoSegundos / distancia;
+                pace = segundosParaMMSS(paceSegundos) + ' /km';
+            }
+        } else {
+            // Nota não existe diretamente, precisamos interpolar
+            try {
+                const notaCalculada = calcularNotaPorTabela('00:00', idade, sexo, atividade);
+                // Aqui precisamos encontrar o tempo para esta nota específica
+                // Vamos usar interpolação inversa
+                tempo = tempoParaNotaEspecifica(nota, idade, sexo, atividade);
+                if (tempo !== '--') {
+                    const tempoSegundos = tempoStringParaSegundos(tempo);
+                    
+                    // Calcular pace
+                    if (atividade === 'natacao50' || atividade === 'natacao100') {
+                        // Para natação: pace por 100m
+                        const distanciaMetros = atividade === 'natacao50' ? 50 : 100;
+                        const pacePor100m = (tempoSegundos / distanciaMetros) * 100;
+                        pace = segundosParaMMSS(pacePor100m) + ' /100m';
+                    } else {
+                        // Para corrida/caminhada: pace por km
+                        const paceSegundos = tempoSegundos / distancia;
+                        pace = segundosParaMMSS(paceSegundos) + ' /km';
+                    }
+                }
+            } catch (e) {
+                // Mantém '--' se não for possível calcular
+            }
+        }
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${nota}</td>
+            <td>${tempo}</td>
+            <td>${pace}</td>
+        `;
+        tbody.appendChild(tr);
+    }
+}
+
+// Função auxiliar para encontrar tempo para uma nota específica usando interpolação inversa
+function tempoParaNotaEspecifica(notaDesejada, idade, sexo, atividade) {
+    const faixaEtaria = obterFaixaEtaria(idade, atividade);
+    const tabela = tabelasPontuacao[atividade];
+    const sexoTabela = sexo === 'M' ? 'masculino' : 'feminino';
+
+    if (!tabela || !tabela[sexoTabela] || !tabela[sexoTabela][faixaEtaria]) {
+        return '--';
+    }
+
+    const pontosFaixa = tabela[sexoTabela][faixaEtaria];
+    const pontos = Object.keys(pontosFaixa).map(Number).sort((a, b) => a - b);
+
+    if (pontos.length < 2) return '--';
+
+    // Encontrar pontos que envolvem a nota desejada
+    for (let i = 0; i < pontos.length - 1; i++) {
+        const notaInferior = pontos[i];
+        const notaSuperior = pontos[i + 1];
+
+        if (notaDesejada >= notaInferior && notaDesejada <= notaSuperior) {
+            const tempoInferior = tempoStringParaSegundos(pontosFaixa[notaInferior]);
+            const tempoSuperior = tempoStringParaSegundos(pontosFaixa[notaSuperior]);
+
+            // Interpolação linear
+            const proporcao = (notaDesejada - notaInferior) / (notaSuperior - notaInferior);
+            const tempoInterpolado = tempoInferior + proporcao * (tempoSuperior - tempoInferior);
+
+            return segundosParaMMSS(tempoInterpolado);
+        }
+    }
+
+    return '--';
+}
+
 // Função para calcular nota baseada nas novas tabelas
 function calcularNotaPorTabela(tempo, idade, sexo, atividade) {
     const faixaEtaria = obterFaixaEtaria(idade, atividade);
@@ -671,45 +797,130 @@ function atualizarEmojiAtividade() {
     labelAtividade.innerHTML = `${emoji} Atividade:`;
 }
 
-// Preenche tabela de referência para um sexo específico em um tbody dado
-function preencherTabelaParaSexo(tbodyId, sexoReferencia) {
-    const tbody = document.getElementById(tbodyId);
+// Preenche tabela de referência com faixas etárias intercaladas por sexo
+function preencherTabelaReferencia() {
+    const tbody = document.getElementById('tabelaTemposReferencia');
     if (!tbody) return;
+    
     tbody.innerHTML = '';
-    const distancias = [
-        { label: '2.4', km: 2.4 },
-        { label: '5', km: 5 },
-        { label: '10', km: 10 },
-        { label: '15', km: 15 },
-        { label: 'Meia', km: 21.0975 }
-    ];
-
-    for (let idade = 25; idade <= 60; idade += 5) {
-        const tr = document.createElement('tr');
-        let rowHtml = `<td>${idade} anos</td>`;
-
-        for (const d of distancias) {
-            try {
-                const { tempo, pace } = tempoEPaceParaNota(100, idade, sexoReferencia, d.km, 'A1');
-                rowHtml += `<td class="ref-cell"><div class="ref-tempo">${tempo}</div><div class="ref-pace">${pace}</div></td>`;
-            } catch (err) {
-                rowHtml += `<td class="ref-cell"><div class="ref-tempo">--</div><div class="ref-pace">--</div></td>`;
-            }
+    
+    // Obter atividade selecionada
+    const atividadeSelect = document.getElementById('atividade');
+    if (!atividadeSelect) return;
+    
+    const atividade = atividadeSelect.value;
+    
+    // Obter idade e sexo selecionados
+    const idade = parseInt(document.getElementById('idade').value) || 30;
+    const sexo = document.getElementById('sexo').value;
+    
+    // Obter todas as faixas etárias para a atividade
+    const faixasEtarias = obterTodasFaixasEtarias(atividade);
+    
+    // Definir notas de 100 para 50 com decremento de 10
+    const notas = [100, 90, 80, 70, 60, 50];
+    
+    // Criar cabeçalho dinâmico
+    const thead = tbody.previousElementSibling;
+    if (thead) {
+        let headerHtml = '<tr><th>Faixa Etária</th>';
+        
+        // Adicionar colunas para cada nota
+        for (const nota of notas) {
+            headerHtml += `<th>Nota ${nota}</th>`;
         }
-
-        tr.innerHTML = rowHtml;
-        tbody.appendChild(tr);
+        headerHtml += '</tr>';
+        thead.innerHTML = headerHtml;
+    }
+    
+    // Preencher tabela com faixas etárias intercaladas por sexo
+    for (const faixa of faixasEtarias) {
+        // Linha masculino
+        const trMasc = document.createElement('tr');
+        let rowHtmlMasc = `<td>${faixa.nome} (M)</td>`;
+        
+        for (const nota of notas) {
+            let tempo = '--';
+            
+            try {
+                tempo = tempoParaNotaEspecifica(nota, faixa.idadeRepresentativa, 'M', atividade);
+            } catch (err) {
+                console.warn(`Erro ao obter tempo masculino para ${faixa.nome} nota ${nota}:`, err);
+            }
+            
+            rowHtmlMasc += `<td>${tempo}</td>`;
+        }
+        
+        trMasc.innerHTML = rowHtmlMasc;
+        tbody.appendChild(trMasc);
+        
+        // Linha feminino
+        const trFem = document.createElement('tr');
+        let rowHtmlFem = `<td>${faixa.nome} (F)</td>`;
+        
+        for (const nota of notas) {
+            let tempo = '--';
+            
+            try {
+                tempo = tempoParaNotaEspecifica(nota, faixa.idadeRepresentativa, 'F', atividade);
+            } catch (err) {
+                console.warn(`Erro ao obter tempo feminino para ${faixa.nome} nota ${nota}:`, err);
+            }
+            
+            rowHtmlFem += `<td>${tempo}</td>`;
+        }
+        
+        trFem.innerHTML = rowHtmlFem;
+        tbody.appendChild(trFem);
     }
 }
 
-// Preenche ambas as tabelas (homens e mulheres)
-function preencherTabelaReferencia() {
-    try {
-        preencherTabelaParaSexo('tabelaTemposM', 'M');
-        preencherTabelaParaSexo('tabelaTemposF', 'F');
-    } catch (e) {
-        console.error('Erro ao preencher tabelas de referência:', e);
+// Função para obter todas as faixas etárias de uma atividade
+function obterTodasFaixasEtarias(atividade) {
+    const faixas = [];
+    
+    if (atividade === 'natacao50' || atividade === 'natacao100') {
+        faixas.push(
+            { nome: '18-30', idadeRepresentativa: 24 },
+            { nome: '31-40', idadeRepresentativa: 35 },
+            { nome: '41-49', idadeRepresentativa: 45 },
+            { nome: '50+', idadeRepresentativa: 55 }
+        );
+    } else if (atividade === 'corrida2400' || atividade === 'caminhada4800') {
+        faixas.push(
+            { nome: '18-25', idadeRepresentativa: 22 },
+            { nome: '26-33', idadeRepresentativa: 30 },
+            { nome: '34-39', idadeRepresentativa: 37 },
+            { nome: '40-45', idadeRepresentativa: 43 },
+            { nome: '46-49', idadeRepresentativa: 48 },
+            { nome: '50+', idadeRepresentativa: 55 }
+        );
+    } else if (atividade === 'corrida3200') {
+        faixas.push(
+            { nome: '18-25', idadeRepresentativa: 22 },
+            { nome: '26-33', idadeRepresentativa: 30 },
+            { nome: '34-39', idadeRepresentativa: 37 },
+            { nome: '40-45', idadeRepresentativa: 43 },
+            { nome: '46-49', idadeRepresentativa: 48 },
+            { nome: '50-54', idadeRepresentativa: 52 },
+            { nome: '55+', idadeRepresentativa: 58 }
+        );
     }
+    
+    return faixas;
+}
+
+// Função auxiliar para obter tempo para nota 100
+function tempoParaNota100(idade, sexo, atividade) {
+    const faixaEtaria = obterFaixaEtaria(idade, atividade);
+    const tabela = tabelasPontuacao[atividade];
+    
+    if (!tabela || !tabela[sexo === 'M' ? 'masculino' : 'feminino'] || !tabela[sexo === 'M' ? 'masculino' : 'feminino'][faixaEtaria]) {
+        return '--';
+    }
+    
+    const pontosFaixa = tabela[sexo === 'M' ? 'masculino' : 'feminino'][faixaEtaria];
+    return pontosFaixa[100] || '--';
 }
 
 // Função helper para obter distância formatada da atividade selecionada
@@ -853,12 +1064,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Restaurar o border-radius original
                 card.style.borderRadius = originalBorderRadius;
 
-                // Cortar 3px a partir do chão
+                // Cortar 2px de cada lado (total 6px considerando scale 3)
                 const ctx = canvas.getContext('2d');
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height - 5); // 3px * scale 3 = 9px
+                const pixelsParaCortar = 6; // 2px × 3 (scale) = 6px
+                const pixelsLaterais = 6; // 2px × 3 (scale) = 6px de cada lado
+                
+                // Cortar laterais e inferior
+                const imageData = ctx.getImageData(
+                    pixelsLaterais, 
+                    0, 
+                    canvas.width - (pixelsLaterais * 2), 
+                    canvas.height - pixelsParaCortar
+                );
                 const croppedCanvas = document.createElement('canvas');
-                croppedCanvas.width = canvas.width;
-                croppedCanvas.height = canvas.height - 5;
+                croppedCanvas.width = canvas.width - (pixelsLaterais * 2);
+                croppedCanvas.height = canvas.height - pixelsParaCortar;
                 croppedCanvas.getContext('2d').putImageData(imageData, 0, 0);
 
                 // Criar link de download
@@ -1101,7 +1321,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 const tempoVal = document.getElementById('tempo').value;
                 const seg = tempoStringParaSegundos(tempoVal);
                 displayTempo = segundosParaMMSS(seg);
-                displayPace = segundosParaMMSS(seg / distancia);
+                
+                // Verificar se é natação para mostrar pace por 100m
+                if (atividade === 'natacao50' || atividade === 'natacao100') {
+                    // Para natação: calcular pace por 100m diretamente
+                    const distanciaMetros = atividade === 'natacao50' ? 50 : 100;
+                    const pacePor100m = (seg / distanciaMetros) * 100;
+                    displayPace = segundosParaMMSS(pacePor100m);
+                } else {
+                    displayPace = segundosParaMMSS(seg / distancia);
+                }
             } catch (e) { /* segura se inputs faltarem */ }
 
             const distLabel = Number.isFinite(distancia)
@@ -1152,7 +1381,13 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('scoreFaixaEtaria').textContent = "🔢 "+faixaEtariaNome;
             document.getElementById('zoneSmall').textContent = zone;
             document.getElementById('cardTempo').textContent = displayTempo;
-            document.getElementById('cardPace').textContent = `${displayPace} /km`;
+            
+            // Exibir pace com unidade correta
+            if (atividade === 'natacao50' || atividade === 'natacao100') {
+                document.getElementById('cardPace').textContent = `${displayPace} /100m`;
+            } else {
+                document.getElementById('cardPace').textContent = `${displayPace} /km`;
+            }
 
             // Exibe o botão copiar e opções se o card existir
             const acoesCard = document.getElementById('cardActions');
@@ -1235,14 +1470,24 @@ document.addEventListener('DOMContentLoaded', function () {
 // Gera dados (array de {x: tempoSegundos, y: nota}) para uma distância e sexo
 function gerarDadosParaDistancia(notas, idade, sexo, km) {
     const dados = [];
+    
+    // Mapear distância para atividade
+    const atividadePorDistancia = {
+        2.4: 'corrida2400',
+        3.2: 'corrida3200',
+        0.05: 'natacao50',
+        0.1: 'natacao100',
+        4.8: 'caminhada4800'
+    };
+    
+    const atividade = atividadePorDistancia[km] || 'corrida2400';
+    
     for (const nota of notas) {
         try {
-            const res = tempoEPaceParaNota(nota, idade, sexo, km, 'A1');
-            let tempo;
-            if (res && typeof res === 'object') tempo = res.tempo || res.time || res.t || res;
-            else tempo = res;
+            // Usar a nova função para obter tempo para nota específica
+            const tempo = tempoParaNotaEspecifica(nota, idade, sexo, atividade);
             const seg = tempoStringParaSegundos(tempo);
-            if (isFinite(seg)) dados.push({ x: seg, y: nota });
+            if (isFinite(seg) && seg > 0) dados.push({ x: seg, y: nota });
             else dados.push({ x: null, y: nota });
         } catch (e) {
             dados.push({ x: null, y: nota });
@@ -1251,116 +1496,135 @@ function gerarDadosParaDistancia(notas, idade, sexo, km) {
     return dados;
 }
 
-// Cria/atualiza todos os gráficos — agora com Nota no eixo Y (iniciando em 50)
+// Cria/atualiza gráfico da atividade selecionada — agora com Nota no eixo Y (iniciando em 50)
 function gerarGraficos() {
     if (typeof Chart === 'undefined') {
         console.warn('Chart.js não carregado');
         return;
     }
 
-    // Intervalo de notas: 50 → 100 (a cada 5)
+    // Intervalo de notas: 100 → 50 (a cada 5)
     const notas = [];
-    for (let n = 50; n <= 100; n += n >= 90 ? 1 : 5) notas.push(n);
+    for (let n = 100; n >= 50; n -= 5) notas.push(n);
 
     const idade = parseInt(document.getElementById('idade')?.value) || 30;
-    const distancias = [
-        { id: 'chart-2-4', km: 2.4, label: '2.4 km' },
-        { id: 'chart-5', km: 5, label: '5 km' },
-        { id: 'chart-10', km: 10, label: '10 km' },
-        { id: 'chart-15', km: 15, label: '15 km' },
-        { id: 'chart-meia', km: 21.0975, label: 'Meia' }
-    ];
+    const atividade = document.getElementById('atividade')?.value || 'corrida2400';
+    
+    // Mapear atividade para distância
+    const distancias = {
+        'corrida2400': 2.4,
+        'corrida3200': 3.2,
+        'natacao50': 0.05,
+        'natacao100': 0.1,
+        'caminhada4800': 4.8
+    };
+    
+    const distancia = distancias[atividade] || 2.4;
+    
+    // Obter nomes das atividades
+    const nomesAtividade = {
+        'corrida2400': 'Corrida 2.4km',
+        'corrida3200': 'Corrida 3.2km',
+        'natacao50': 'Natação 50m',
+        'natacao100': 'Natação 100m',
+        'caminhada4800': 'Caminhada 4.8km'
+    };
+    const atividadeNome = nomesAtividade[atividade] || 'Atividade';
 
     window._charts = window._charts || {};
 
-    for (const d of distancias) {
-        const canvasEl = document.getElementById(d.id);
-        if (!canvasEl) continue;
+    const canvasEl = document.getElementById('chart-atividade');
+    if (!canvasEl) return;
 
-        if (window._charts[d.id]) {
-            try { window._charts[d.id].destroy(); } catch (e) { }
-        }
+    if (window._charts['chart-atividade']) {
+        try { window._charts['chart-atividade'].destroy(); } catch (e) { }
+    }
 
-        const dadosHomens = gerarDadosParaDistancia(notas, idade, 'M', d.km);
-        const dadosMulheres = gerarDadosParaDistancia(notas, idade, 'F', d.km);
+    const dadosHomens = gerarDadosParaDistancia(notas, idade, 'M', distancia);
+    const dadosMulheres = gerarDadosParaDistancia(notas, idade, 'F', distancia);
 
-        const config = {
-            type: 'line',
-            data: {
-                // labels não são mais usados para a série; cada ponto tem x (tempo) e y (nota)
-                datasets: [
-                    {
-                        label: 'Homens',
-                        data: dadosHomens,
-                        borderColor: 'rgb(25, 118, 210)',
-                        backgroundColor: 'rgba(25,118,210,0.08)',
-                        spanGaps: true,
-                        tension: 0.25,
-                        pointRadius: 3,
-                        parsing: false // usar objetos {x,y} diretamente
-                    },
-                    {
-                        label: 'Mulheres',
-                        data: dadosMulheres,
-                        borderColor: 'rgb(216, 27, 96)',
-                        backgroundColor: 'rgba(216,27,96,0.08)',
-                        spanGaps: true,
-                        tension: 0.25,
-                        pointRadius: 3,
-                        parsing: false
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: { mode: 'nearest', intersect: false },
-                plugins: {
-                    legend: { position: 'top' },
-                    tooltip: {
-                        callbacks: {
-                            title: function (items) {
-                                // mostrar tempo no título do tooltip
-                                const item = items[0];
-                                return item && item.raw && item.raw.x != null ? segundosParaMMSS(item.raw.x) : '';
-                            },
-                            label: function (ctx) {
-                                const v = ctx.raw;
-                                const nota = (v && v.y != null) ? v.y : '--';
-                                return (ctx.dataset.label || '') + ': Nota ' + nota;
-                            }
-                        }
-                    }
+    // Atualizar título do gráfico
+    const graficoTitulo = document.getElementById('grafico-titulo');
+    if (graficoTitulo) {
+        graficoTitulo.textContent = atividadeNome;
+    }
+
+    const config = {
+        type: 'line',
+        data: {
+            // labels não são mais usados para a série; cada ponto tem x (tempo) e y (nota)
+            datasets: [
+                {
+                    label: 'Homens',
+                    data: dadosHomens,
+                    borderColor: 'rgb(25, 118, 210)',
+                    backgroundColor: 'rgba(25,118,210,0.08)',
+                    spanGaps: true,
+                    tension: 0.25,
+                    pointRadius: 3,
+                    parsing: false // usar objetos {x,y} diretamente
                 },
-                scales: {
-                    x: {
-                        title: { display: true, text: 'Tempo (mm:ss ou hh:mm:ss)' },
-                        ticks: {
-                            callback: function (value) { return segundosParaMMSS(value); }
+                {
+                    label: 'Mulheres',
+                    data: dadosMulheres,
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255,99,132,0.08)',
+                    spanGaps: true,
+                    tension: 0.25,
+                    pointRadius: 3,
+                    parsing: false // usar objetos {x,y} diretamente
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'nearest', intersect: false },
+            plugins: {
+                legend: { position: 'top' },
+                tooltip: {
+                    callbacks: {
+                        title: function (items) {
+                            // mostrar tempo no título do tooltip
+                            const item = items[0];
+                            return item && item.raw && item.raw.x != null ? segundosParaMMSS(item.raw.x) : '';
                         },
-                        type: 'linear',
-                        position: 'bottom'
-                    },
-                    y: {
-                        title: { display: true, text: 'Nota' },
-                        min: 50,
-                        max: 100,
-                        ticks: {
-                            stepSize: 5
+                        label: function (ctx) {
+                            const v = ctx.raw;
+                            const nota = (v && v.y != null) ? v.y : '--';
+                            return (ctx.dataset.label || '') + ': Nota ' + nota;
                         }
                     }
                 }
+            },
+            scales: {
+                x: {
+                    title: { display: true, text: 'Tempo (mm:ss ou hh:mm:ss)' },
+                    ticks: {
+                        callback: function (value) { return segundosParaMMSS(value); }
+                    },
+                    type: 'linear',
+                    position: 'bottom'
+                },
+                y: {
+                    title: { display: true, text: 'Nota' },
+                    min: 50,
+                    max: 100,
+                    ticks: {
+                        stepSize: 5
+                    }
+                }
             }
-        };
-
-        const containerEl = canvasEl.parentElement;
-        if (containerEl) containerEl.style.minHeight = '220px';
-
-        try {
-            window._charts[d.id] = new Chart(canvasEl.getContext('2d'), config);
-        } catch (e) {
-            console.error('Erro ao criar gráfico', d.id, e);
         }
+    };
+
+    const containerEl = canvasEl.parentElement;
+    if (containerEl) containerEl.style.minHeight = '220px';
+
+    try {
+        window._charts['chart-atividade'] = new Chart(canvasEl.getContext('2d'), config);
+    } catch (e) {
+        console.error('Erro ao criar gráfico', 'chart-atividade', e);
     }
 }
 
@@ -1387,6 +1651,7 @@ function onFormInputsChange() {
     atualizarTituloGraficos();
     atualizarTituloReferencia();
     atualizarTabelaNotas();
+    preencherTabelaReferencia(); // Adicionar chamada para atualizar tabela de referência
     try { gerarGraficos(); } catch (e) { }
 }
 
@@ -1417,65 +1682,9 @@ function atualizarTabelaNotas() {
     const idade = parseInt(document.getElementById('idade').value);
     const sexo = document.getElementById('sexo').value;
     const atividade = document.getElementById('atividade').value;
-    const tabelaNotas = document.getElementById('tabelaNotas');
-    const idadeRef = document.getElementById('idade-ref');
-    const distanciaRef = document.getElementById('distancia-ref');
-
-    // Atualiza a idade no título
-    idadeRef.textContent = idade;
-
-    // Atualiza a distância no título
-    const distancias = {
-        'corrida2400': 2.4,
-        'corrida3200': 3.2,
-        'natacao50': 0.05,
-        'natacao100': 0.1,
-        'caminhada4800': 4.8
-    };
-    distanciaRef.textContent = distancias[atividade] || 2.4;
-
-    // Limpa a tabela
-    tabelaNotas.innerHTML = '';
-
-    // Gera linhas para notas de 100 a 50 usando o novo sistema
-    const faixaEtaria = obterFaixaEtaria(idade, atividade);
-    const tabela = tabelasPontuacao[atividade];
-
-    if (!tabela || !tabela[sexo] || !tabela[sexo][faixaEtaria]) {
-        tabelaNotas.innerHTML = '<tr><td colspan="3">Tabela não disponível para esta atividade/faixa etária</td></tr>';
-        return;
-    }
-
-    const pontosFaixa = tabela[sexo][faixaEtaria];
-    const pontos = Object.keys(pontosFaixa).map(Number).sort((a, b) => a - b);
-
-    for (let nota = 50; nota <= 100; nota += 1) {
-        let tempo = '--:--';
-        let pace = '--:--';
-
-        // Encontrar tempo correspondente à nota
-        for (const ponto of pontos) {
-            if (Math.abs(ponto - nota) < 0.5) {
-                tempo = pontosFaixa[ponto];
-                // Calcular pace se for corrida/caminhada
-                const distancia = distancias[atividade] || 2.4;
-                if (distancia > 0.1) { // Não calcular pace para natação
-                    const tempoSegundos = tempoStringParaSegundos(tempo);
-                    const paceSegundos = tempoSegundos / distancia;
-                    pace = segundosParaMMSS(paceSegundos);
-                }
-                break;
-            }
-        }
-
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${nota}</td>
-            <td>${tempo}</td>
-            <td>${pace}</td>
-        `;
-        tabelaNotas.appendChild(tr);
-    }
+    
+    // Usar a nova função para preencher a tabela
+    preencherTabelaNotas(atividade, idade, sexo);
 }
 
 
@@ -1486,6 +1695,16 @@ function atualizarTituloReferencia() {
     const idade = document.getElementById('idade').value;
     const sexo = document.getElementById('sexo').value;
     const atividade = document.getElementById('atividade').value;
+
+    // Obter nome da atividade
+    const nomesAtividade = {
+        'corrida2400': 'Corrida 2.4km',
+        'corrida3200': 'Corrida 3.2km',
+        'natacao50': 'Natação 50m',
+        'natacao100': 'Natação 100m',
+        'caminhada4800': 'Caminhada 4.8km'
+    };
+    const atividadeNome = nomesAtividade[atividade] || 'Atividade';
 
     // Obter distância da atividade selecionada
     const distancias = {
@@ -1505,7 +1724,7 @@ function atualizarTituloReferencia() {
     // Atualiza o título da tabela de referência
     const tituloReferencia = document.getElementById('titulo-referencia');
     if (tituloReferencia) {
-        tituloReferencia.textContent = `Tempos de Referência para Nota 100 (A1)`;
+        tituloReferencia.textContent = `Tempos de Referência por Nota - ${atividadeNome}`;
     }
 }
 
@@ -2344,86 +2563,7 @@ function recalibrarLarguraOverlayDaOrigem() {
         _compose.cardEl.style.transformOrigin = 'top left';
         _compose.cardEl.style.transform = `scale(${s})`;
     });
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    const metasTop = window.temposRefOrig;
-    if (!metasTop) return;
-
-    // --- Funções auxiliares ---
-    const tempoParaSegundos = (tempoStr) => {
-        if (!tempoStr) return 0;
-        const partes = tempoStr.split(":").map(Number);
-        if (partes.length === 2) return partes[0] * 60 + partes[1];
-        if (partes.length === 3) return partes[0] * 3600 + partes[1] * 60 + partes[2];
-        return 0;
-    };
-
-    const segundosParaTempo = (seg) => {
-        let min = Math.floor(seg / 60);
-        let s = seg % 60;
-
-        // Arredonda os segundos
-        s = Math.round(s);
-
-        // Se virou 60, ajusta
-        if (s === 60) {
-            min += 1;
-            s = 0;
-        }
-
-        return `${min}:${s.toString().padStart(2, "0")}`;
-    };
-
-    const calcularPace = (distanciaKm, tempoStr) => {
-        const segundos = tempoParaSegundos(tempoStr);
-        if (!segundos || !distanciaKm) return "--:--";
-        const paceSeg = segundos / distanciaKm;
-        return segundosParaTempo(paceSeg);
-    };
-
-    // --- Preenche tabela estática ---
-    const tbody = document.getElementById("temposRefOrigTbody");
-    if (!tbody) return;
-
-    tbody.innerHTML = '';
-
-    for (const [distancia, dados] of Object.entries(metasTop)) {
-        // Normaliza a distância (ex.: "meia" → 21.1 km)
-        const km = distancia.includes("meia")
-            ? 21.1
-            : parseFloat(distancia.replace("km", "").replace(",", "."));
-
-        // Exibe apenas metas existentes
-        if (dados.M) {
-            const { idade, tempo } = dados.M;
-            const tr = document.createElement('tr');
-            tr.style.background = 'rgb(232, 240, 255)';
-            tr.innerHTML = `
-                <td>${distancia}</td>
-                <td>M</td>
-                <td>${idade}</td>
-                <td>${tempo}</td>
-                <td>${calcularPace(km, tempo)}</td>
-            `;
-            tbody.appendChild(tr);
-        }
-
-        if (dados.F) {
-            const { idade, tempo } = dados.F;
-            const tr = document.createElement('tr');
-            tr.style.background = 'rgb(255, 232, 240)';
-            tr.innerHTML = `
-                <td>${distancia}</td>
-                <td>F</td>
-                <td>${idade}</td>
-                <td>${tempo}</td>
-                <td>${calcularPace(km, tempo)}</td>
-            `;
-            tbody.appendChild(tr);
-        }
-    }
-});
+};
 
 // Modificar o event listener do formulário para incluir a verificação de intervalo
 const originalSubmitHandler = document.getElementById('calcForm')?.onsubmit;

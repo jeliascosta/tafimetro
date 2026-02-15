@@ -85,18 +85,18 @@
                         </div>
                     </div>
                     <div class="score-big" id="scoreBig"></div>
-                    <div id="scoreAtividade" style="display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 800; text-align: center; width: 100%; color: #666; margin: 0px 0 10px 0; padding: 0px 10px 0px 0px"><span id="cardEmojiDireita" style="margin-right: 2px;"></span><span id="scoreAtividadeText"></span></div>
-                    <div id="scoreFaixaEtaria" style="display: flex; justify-content: center; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; text-align: center; width: 100%; color: #888; margin: 3px 0 15px 0;"></div>
+                    <div id="scoreAtividade" style="display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 800; text-align: center; color: #666; margin: 0px 0 10px 0; padding: 0px 10px"><span id="cardEmojiDireita" style="margin-right: 2px;"></span><span id="scoreAtividadeText"></span></div>
+                    <div id="scoreFaixaEtaria" style="display: flex; justify-content: center; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; text-align: center; color: #888; margin: 3px 0 5px 0;padding: 0px 10px;"></div>
                     <div class="zone-small" id="zoneSmall"></div>
                     <div class="card-meta"
-                        style="display:flex;gap:12px;margin-top:8px;align-items:center;justify-content:center;">
+                        style="display:flex;gap:12px;margin-top:15px;align-items:center;justify-content:center;padding: 0px 10px;">
                         <div class="meta-item" style="text-align:center">
                             <div style="font-size:.75rem;font-weight:700;opacity:.9">🕒 Tempo</div>
                             <div style="font-size:.95rem;font-weight:800" id="cardTempo"></div>
                         </div>
                         <div class="meta-item" style="text-align:center">
-                            <div style="font-size:.75rem;font-weight:700;opacity:.9">🏃🏻‍♂️‍➡️ Pace</div>
-                            <div style="font-size:.95rem;font-weight:800" id="cardPace"></div>
+                            <div style="font-size:.75rem;font-weight:700;opacity:.9">➡️ Pace</div>
+                            <div style="font-size:.85rem;font-weight:600; margin-top: 1px;" id="cardPace"></div>
                         </div>
                     </div>
                     <div class="card-corner card-corner-left"></div>
@@ -191,26 +191,6 @@
         </div>
 
         <hr style="margin-top: 20px;" />
-        <!-- Seção: temposRefOrig (inserida) -->
-        <div id="tempos-ref-orig" class="tempos-ref-orig tabela-referencia">
-            <h2>Metas Top</h2>
-            <div id="temposRefOrigContent">
-                <table cellpadding="6" cellspacing="0" style="border-collapse: collapse;">
-                    <thead>
-                        <tr style="background: #eee;">
-                            <th>Distância</th>
-                            <th>Sexo</th>
-                            <th>Idade</th>
-                            <th>Tempo</th>
-                            <th>Pace / km</th>
-                        </tr>
-                    </thead>
-                    <tbody id="temposRefOrigTbody">
-                        <!-- preenchido via JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
         <!-- Nova tabela de referência por nota -->
         <div class="tabela-notas">
@@ -240,28 +220,8 @@
 
             <div class="grid-graficos">
                 <div class="grafico-wrap">
-                    <h4>2.4 km</h4>
-                    <canvas id="chart-2-4" width="400" height="250"></canvas>
-                </div>
-
-                <div class="grafico-wrap">
-                    <h4>5 km</h4>
-                    <canvas id="chart-5" width="400" height="250"></canvas>
-                </div>
-
-                <div class="grafico-wrap">
-                    <h4>10 km</h4>
-                    <canvas id="chart-10" width="400" height="250"></canvas>
-                </div>
-
-                <div class="grafico-wrap">
-                    <h4>15 km</h4>
-                    <canvas id="chart-15" width="400" height="250"></canvas>
-                </div>
-
-                <div class="grafico-wrap" style="margin-top: 40px; padding-bottom: 50px;">
-                    <h4>Meia Maratona</h4>
-                    <canvas id="chart-meia" width="400" height="250"></canvas>
+                    <h4 id="grafico-titulo">Corrida 2.4km</h4>
+                    <canvas id="chart-atividade" width="400" height="250"></canvas>
                 </div>
             </div>
         </div>
@@ -269,44 +229,19 @@
 
         <div class="tabela-referencia">
             <h2 id="titulo-referencia">Tempos de Referência para Nota 100</h2>
-            <div class="table-responsive grid-duas-tabelas">
-                <div class="tabela-wrap">
-                    <h3>Homens</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Idade</th>
-                                <th>2.4km</th>
-                                <th>5km</th>
-                                <th>10km</th>
-                                <th>15km</th>
-                                <th>Meia</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaTemposM">
-                            <!-- preenchido via JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="tabela-wrap">
-                    <h3>Mulheres</h3>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Idade</th>
-                                <th>2.4km</th>
-                                <th>5km</th>
-                                <th>10km</th>
-                                <th>15km</th>
-                                <th>Meia</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaTemposF">
-                            <!-- preenchido via JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="table-responsive">
+                <table>
+                    <thead id="tabelaReferenciaHeader">
+                        <tr>
+                            <th>Faixa Etária</th>
+                            <th>Tempo Masc</th>
+                            <th>Tempo Fem</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaTemposReferencia">
+                        <!-- preenchido via JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
 

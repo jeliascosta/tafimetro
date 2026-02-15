@@ -367,7 +367,7 @@ tr:hover {
     font-family: 'Helvetica Neue', Arial, sans-serif;
     text-align: center;
     position: relative;
-    min-width: 172px;
+    /* min-width: 172px; */
     /* para posicionar cantos absolutos */
 }
 
