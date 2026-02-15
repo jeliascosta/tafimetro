@@ -1130,7 +1130,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
             let nota;
-            let notaA1;
             const tempo = document.getElementById('tempo').value;
             const atividade = document.getElementById('atividade').value;
             
@@ -1147,29 +1146,26 @@ document.addEventListener('DOMContentLoaded', function () {
             // Obter faixa etária para exibição
             const faixaEtaria = obterFaixaEtaria(idade, atividade);
             const nomesFaixaEtaria = {
-                '18a25': 'Faixa: 18 a 25 anos',
-                '18a30': 'Faixa: 18 a 30 anos',
-                '26a33': 'Faixa: 26 a 33 anos',
-                '31a40': 'Faixa: 31 a 40 anos',
-                '34a39': 'Faixa: 34 a 39 anos',
-                '41a49': 'Faixa: 41 a 49 anos',
-                '40a45': 'Faixa: 40 a 45 anos',
-                '46a49': 'Faixa: 46 a 49 anos',
-                '49a49': 'Faixa: 49 anos',
-                '50a54': 'Faixa: 50 a 54 anos',
-                '50ouMais': 'Faixa: 50 anos ou mais',
-                '55ouMais': 'Faixa: 55 anos ou mais',
-                '60ouMais': 'Faixa: 60 anos ou mais'
+                '18a25': 'Faixa: 18 a 25',
+                '18a30': 'Faixa: 18 a 30',
+                '26a33': 'Faixa: 26 a 33',
+                '31a40': 'Faixa: 31 a 40',
+                '34a39': 'Faixa: 34 a 39',
+                '41a49': 'Faixa: 41 a 49',
+                '40a45': 'Faixa: 40 a 45',
+                '46a49': 'Faixa: 46 a 49',
+                '50a54': 'Faixa: 50 a 54',
+                '50ouMais': 'Faixa: 50 ou mais',
+                '55ouMais': 'Faixa: 55 ou mais',
+                '60ouMais': 'Faixa: 60 ou mais'
             };
             const faixaEtariaNome = nomesFaixaEtaria[faixaEtaria] || faixaEtaria;
 
             // Usar novo sistema de cálculo baseado em tabelas
             nota = calcularNotaPorTabela(tempo, idade, sexo, atividade);
-            notaA1 = nota; // No novo sistema, não há diferença entre níveis
 
             // Renderiza a "share card" estilo app de corrida
             const notaInteiro = Math.max(0, Math.floor(Number(nota) || 0));
-            const notaA1Inteiro = Math.max(0, Math.floor(Number(notaA1) || 0));
 
 
             // zona de exemplo: décadas, 90+ é "90-100"
@@ -1628,23 +1624,10 @@ function gerarGraficos() {
     }
 }
 
-// Função para converter código do nível para nome completo
-function codigoParaNomeNivel(codigo) {
-    const nomes = {
-        'A1': 'ALFA 1',
-        'A2': 'ALFA 2',
-        'B1': 'BRAVO 1',
-        'B2': 'BRAVO 2',
-        'L1': 'LIGHT 1',
-        'L2': 'LIGHT 2'
-    };
-    return nomes[codigo] || codigo;
-}
-
 // Adicione esta função para atualizar o título
 function atualizarTituloGraficos() {
     const idade = inputIdade.value;
-    tituloGraficos.textContent = `Gráficos: Nota vs Tempo, A1`;
+    tituloGraficos.textContent = `Gráficos: Nota vs Tempo`;
 }
 
 function onFormInputsChange() {
@@ -1719,7 +1702,6 @@ function atualizarTituloReferencia() {
     document.getElementById('idade-ref').textContent = idade;
     document.getElementById('distancia-ref').textContent = distancia;
     document.getElementById('sexo-ref').textContent = sexo === 'M' ? 'Masc.' : 'Fem.';
-    document.getElementById('nivel-ref').textContent = 'A1';
 
     // Atualiza o título da tabela de referência
     const tituloReferencia = document.getElementById('titulo-referencia');
@@ -1735,15 +1717,17 @@ function atualizarTituloReferencia() {
 
 // Adicionar listener para o toggle de mostrar/ocultar Pace
 document.getElementById('togglePace').addEventListener('change', function () {
-    const paceContainers = document.querySelectorAll('.meta-item:has(#cardPace)');
+    const paceContainers = document.querySelectorAll('.meta-item');
     const isChecked = this.checked;
 
     // Salvar preferência no localStorage
     localStorage.setItem('showPace', isChecked);
 
-    // Mostrar ou ocultar todo o container de Pace
-    paceContainers.forEach(container => {
-        container.style.display = isChecked ? 'unset' : 'none';
+    // Mostrar ou ocultar apenas o container de Pace (segundo meta-item)
+    paceContainers.forEach((container, index) => {
+        if (index === 1) { // Segundo meta-item é o Pace
+            container.style.display = isChecked ? 'flex' : 'none';
+        }
     });
 
     // Atualizar o card de compartilhamento
@@ -1755,14 +1739,16 @@ document.getElementById('togglePace').addEventListener('change', function () {
 // Verificar preferências salvas ao carregar a página
 document.addEventListener('DOMContentLoaded', function () {
     const togglePace = document.getElementById('togglePace');
-    const paceContainers = document.querySelectorAll('.meta-item:has(#cardPace)');
+    const paceContainers = document.querySelectorAll('.meta-item');
     const savedPacePreference = localStorage.getItem('showPace');
     const showPace = savedPacePreference === null ? true : savedPacePreference === 'true';
 
     // Aplicar preferência do Pace
     togglePace.checked = showPace;
-    paceContainers.forEach(container => {
-        container.style.display = showPace ? 'unset' : 'none';
+    paceContainers.forEach((container, index) => {
+        if (index === 1) { // Segundo meta-item é o Pace
+            container.style.display = showPace ? 'flex' : 'none';
+        }
     });
 });
 

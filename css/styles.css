@@ -389,6 +389,8 @@ tr:hover {
     /* referencia para .rev absoluta */
 }
 
+
+
 /* pequeno label de revisão posicionado ao lado sem alterar o centramento */
 .share-card .share-top .main .rev {
     position: absolute;
@@ -433,6 +435,14 @@ tr:hover {
     line-height: 1;
     letter-spacing: -0.02em;
     padding: 0 10px;
+}
+
+.share-card .card-meta .meta-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-direction: column;
+    height: 38px;
 }
 
 .switch {
