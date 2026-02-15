@@ -384,15 +384,15 @@ class StravaIntegration {
             // Comparar tempos para detectar pausas
             const diferencaTempos = Math.abs(activity.elapsed_time - activity.moving_time);
             if (diferencaTempos > 10)
-                alert('De acordo com o STRAVA, o tempo decorrido desta corrida foi maior que o tempo de movimentação. Lembre de indicar ao TAF se houve ou não pausa total!');
+                alert('De acordo com o STRAVA, o tempo decorrido desta corrida foi maior que o tempo de movimentação. Lembre de indicar ao TAFímetro se houve ou não pausa total!');
 
             this.updateStatus(`Atividade importada: ${activity.name} (${dataFormatada})<br>Distância: ${(activity.distance / 1000).toFixed(2)}km<br>Tempo de movimentação: ${tempoMovFormatado}<br>Tempo decorrido: ${tempoDeslocFormatado}`, 'success');
             
             // Salvar no localStorage
-            localStorage.setItem('taf_distancia', document.getElementById('distancia').value);
-            localStorage.setItem('taf_tempo', tempoFormatado);
-            localStorage.setItem('taf_pace', paceFormatado);
-            localStorage.setItem('taf_tipoEntrada', 'tempo');
+            localStorage.setItem('tafimetro_distancia', document.getElementById('distancia').value);
+            localStorage.setItem('tafimetro_tempo', tempoFormatado);
+            localStorage.setItem('tafimetro_pace', paceFormatado);
+            localStorage.setItem('tafimetro_tipoEntrada', 'tempo');
             
         } catch (error) {
             this.updateStatus('Erro ao importar dados: ' + error.message, 'error');
@@ -435,13 +435,13 @@ class StravaIntegration {
 
 
 /**
- * Calcula os pontos Hustle com base na distância percorrida e nota TAF
+ * Calcula os pontos Hustle com base na distância percorrida e nota TAFímetro
  * @param {number} distancia - Distância em quilômetros
- * @param {number} notaTAF - Nota no TAF (0-100)
+ * @param {number} notaTAFímetro - Nota no TAFímetro (0-100)
  * @returns {number} - Pontos Hustle escalonados pela nota
  */
-function calcularPontosHustle(distancia, notaTAF, idade, distanciaAtual) {
-    if (!distancia || isNaN(distancia) || !notaTAF || isNaN(notaTAF)) return 0;
+function calcularPontosHustle(distancia, notaTAFímetro, idade, distanciaAtual) {
+    if (!distancia || isNaN(distancia) || !notaTAFímetro || isNaN(notaTAFímetro)) return 0;
 
     const deltaCorrida = 0.6435; //km
     const deltaEsteira = 0.7235; //km
@@ -464,10 +464,10 @@ function calcularPontosHustle(distancia, notaTAF, idade, distanciaAtual) {
     const notaBaseF = calcularNotaPorPace("7:00", 25, 'F', distanciaAtual, "A1");
     let notaBase = notaBaseF;
 
-    // if (notaTAF < notaBase)
+    // if (notaTAFímetro < notaBase)
     //     deltaEsforco = deltaCaminhada;
 
-    const fatorEscala = notaTAF / notaBase;
+    const fatorEscala = notaTAFímetro / notaBase;
     console.log("Nota base para pts hustle:", notaBase, "fator escala:", fatorEscala)
 
     return (distancia / deltaEsforco) * (fatorEscala > 1 ? fatorEscala : 1);
@@ -484,17 +484,17 @@ function atualizarEmojisPorSexo(sexo) {
         labelSexo.innerHTML = sexo === 'M' ? '👨 Sexo:' : '👩 Sexo:';
     }
 
-    // Atualiza emoji no título TAF
-    const tituloTAF = document.querySelector('h1');
-    if (tituloTAF) {
+    // Atualiza emoji no título TAFímetro
+    const tituloTAFímetro = document.querySelector('h1');
+    if (tituloTAFímetro) {
         const emojiCorredor = sexo === 'M' ? '🏃🏻‍♂️' : '🏃🏻‍♀️';
         // Substitui o emoji do corredor mantendo o resto do conteúdo
-        const textoAtual = tituloTAF.innerHTML;
+        const textoAtual = tituloTAFímetro.innerHTML;
         // Substitui tanto o emoji masculino quanto feminino do corredor
         const textoNovo = textoAtual
             .replace(/🏃🏻‍♀️/g, emojiCorredor)
             .replace(/🏃🏻‍♂️/g, emojiCorredor);
-        tituloTAF.innerHTML = textoNovo;
+        tituloTAFímetro.innerHTML = textoNovo;
     }
 
     // Atualiza a frase de instrução
@@ -566,14 +566,14 @@ function atualizarVisibilidadeCampos() {
         stravaContainer.style.display = 'none';
         document.getElementById('tempo').required = true;
         document.getElementById('pace').required = false;
-        localStorage.setItem('taf_tipoEntrada', 'tempo');
+        localStorage.setItem('tafimetro_tipoEntrada', 'tempo');
     } else if (tipoSelecionado === 'pace') {
         entradaTempo.style.display = 'none';
         entradaPace.style.display = 'block';
         stravaContainer.style.display = 'none';
         document.getElementById('tempo').required = false;
         document.getElementById('pace').required = true;
-        localStorage.setItem('taf_tipoEntrada', 'pace');
+        localStorage.setItem('tafimetro_tipoEntrada', 'pace');
     } else if (tipoSelecionado === 'importar') {
         console.log("ENTROU AQUI")
         entradaTempo.style.display = 'none';
@@ -581,7 +581,7 @@ function atualizarVisibilidadeCampos() {
         stravaContainer.style.display = 'block';
         document.getElementById('tempo').required = false;
         document.getElementById('pace').required = false;
-        localStorage.setItem('taf_tipoEntrada', 'importar');
+        localStorage.setItem('tafimetro_tipoEntrada', 'importar');
     }
 }
 
@@ -611,7 +611,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // restaurar tipoEntrada salvo
-    const tipoSalvo = localStorage.getItem('taf_tipoEntrada');
+    const tipoSalvo = localStorage.getItem('tafimetro_tipoEntrada');
     if (tipoSalvo === 'tempo' || tipoSalvo === 'pace' || tipoSalvo === 'importar') {
         const rb = document.querySelector(`input[name="tipoEntrada"][value="${tipoSalvo}"]`);
         if (rb) rb.checked = true;
@@ -644,37 +644,37 @@ document.addEventListener('DOMContentLoaded', function () {
     const iEl = document.getElementById('idade');
     const dEl = document.getElementById('distancia');
     const sEl = document.getElementById('sexo');
-    const vT = localStorage.getItem('taf_tempo');
-    const vP = localStorage.getItem('taf_pace');
-    const vI = localStorage.getItem('taf_idade');
-    const vD = localStorage.getItem('taf_distancia');
-    const vS = localStorage.getItem('taf_sexo');
-    const vUltimoTaf = localStorage.getItem('taf_ultimoTaf');
+    const vT = localStorage.getItem('tafimetro_tempo');
+    const vP = localStorage.getItem('tafimetro_pace');
+    const vI = localStorage.getItem('tafimetro_idade');
+    const vD = localStorage.getItem('tafimetro_distancia');
+    const vS = localStorage.getItem('tafimetro_sexo');
+    const vUltimoTaf = localStorage.getItem('tafimetro_ultimoTaf');
     if (tEl && vT != null) tEl.value = vT;
     if (pEl && vP != null) pEl.value = vP;
     if (iEl && vI != null) iEl.value = vI;
     if (dEl && vD != null) dEl.value = vD;
     if (sEl && vS != null) sEl.value = vS;
     if (document.getElementById('ultimoTaf') && vUltimoTaf != null) document.getElementById('ultimoTaf').value = vUltimoTaf;
-    if (tEl) tEl.addEventListener('input', () => localStorage.setItem('taf_tempo', tEl.value || ''));
-    if (pEl) pEl.addEventListener('input', () => localStorage.setItem('taf_pace', pEl.value || ''));
-    if (iEl) iEl.addEventListener('change', () => localStorage.setItem('taf_idade', iEl.value || ''));
-    if (dEl) dEl.addEventListener('change', () => localStorage.setItem('taf_distancia', dEl.value || ''));
+    if (tEl) tEl.addEventListener('input', () => localStorage.setItem('tafimetro_tempo', tEl.value || ''));
+    if (pEl) pEl.addEventListener('input', () => localStorage.setItem('tafimetro_pace', pEl.value || ''));
+    if (iEl) iEl.addEventListener('change', () => localStorage.setItem('tafimetro_idade', iEl.value || ''));
+    if (dEl) dEl.addEventListener('change', () => localStorage.setItem('tafimetro_distancia', dEl.value || ''));
     if (sEl) {
         sEl.addEventListener('change', () => {
-            localStorage.setItem('taf_sexo', sEl.value || '');
+            localStorage.setItem('tafimetro_sexo', sEl.value || '');
             atualizarEmojisPorSexo(sEl.value);
         });
         // Atualizar emojis na inicialização também
         atualizarEmojisPorSexo(sEl.value);
     }
 
-    // Adicionar listener para salvar a seleção do Último TAF e atualizar o card, tabelas e gráficos
+    // Adicionar listener para salvar a seleção do Último TAFímetro e atualizar o card, tabelas e gráficos
     const ultimoTafEl = document.getElementById('ultimoTaf');
     if (ultimoTafEl) {
         ultimoTafEl.addEventListener('change', () => {
             const valorTaf = ultimoTafEl.value || '';
-            localStorage.setItem('taf_ultimoTaf', valorTaf);
+            localStorage.setItem('tafimetro_ultimoTaf', valorTaf);
 
             // Atualiza o card
             if (typeof atualizarCardOverlayDoShareCard === 'function') {
@@ -719,13 +719,13 @@ document.addEventListener('DOMContentLoaded', function () {
             if (blob) {
                 const file = new File([blob], filename, { type: 'image/png' });
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: 'TAF', text: 'Meu card do TAF' });
+                    await navigator.share({ files: [file], title: 'TAFímetro', text: 'Meu card do TAFímetro' });
                     return;
                 }
             }
             if (navigator.share) {
                 const dataUrl = canvas.toDataURL('image/png', 1);
-                await navigator.share({ title: 'TAF', text: 'Meu card do TAF', url: dataUrl });
+                await navigator.share({ title: 'TAFímetro', text: 'Meu card do TAFímetro', url: dataUrl });
 
                 return;
             }
@@ -782,7 +782,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Criar link de download
                 const dataUrl = croppedCanvas.toDataURL('image/png');
                 const link = document.createElement('a');
-                link.download = `taf-card-${new Date().toISOString().split('T')[0]}.png`;
+                link.download = `tafimetro-card-${new Date().toISOString().split('T')[0]}.png`;
                 link.href = dataUrl;
 
                 // Adicionar ao documento, clicar e remover
@@ -1086,9 +1086,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const distLabel = Number.isFinite(distancia)
                 ? (parseFloat(distancia.toFixed(1)) % 1 === 0
-                    ? `${distancia.toFixed(0)} k <span class="taf-separator">|</span> <span class="taf-value">${ultimoTaf}</span>`
-                    : `${distancia.toFixed(1)} k <span class="taf-separator">|</span> <span class="taf-value">${ultimoTaf}</span>`)
-                : `-- k <span class="taf-separator">|</span> <span class="taf-value">${ultimoTaf}</span>`;
+                    ? `${distancia.toFixed(0)} k <span class="tafimetro-separator">|</span> <span class="tafimetro-value">${ultimoTaf}</span>`
+                    : `${distancia.toFixed(1)} k <span class="tafimetro-separator">|</span> <span class="tafimetro-value">${ultimoTaf}</span>`)
+                : `-- k <span class="tafimetro-separator">|</span> <span class="tafimetro-value">${ultimoTaf}</span>`;
 
             const hoje = (() => {
                 const d = new Date();
@@ -1194,7 +1194,7 @@ function montarNomeArquivo() {
     const dd = String(now.getDate()).padStart(2, '0');
     const mm = String(now.getMonth() + 1).padStart(2, '0');
     const yy = String(now.getFullYear()).slice(-2);
-    return `taf-${notaStr}-${distStr}_${dd}-${mm}-${yy}.png`;
+    return `tafimetro-${notaStr}-${distStr}_${dd}-${mm}-${yy}.png`;
 }
 
 // Gera dados (array de {x: tempoSegundos, y: nota}) para uma distância e sexo
@@ -1972,8 +1972,8 @@ function configurarCompositor() {
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
                     await navigator.share({
                         files: [file],
-                        title: 'TAF',
-                        text: 'Meu print do TAF'
+                        title: 'TAFímetro',
+                        text: 'Meu print do TAFímetro'
                     });
                     return;
                 }
@@ -1981,8 +1981,8 @@ function configurarCompositor() {
                     // Fallback: compartilhar um data URL (alguns ambientes aceitam)
                     const dataUrl = canvas.toDataURL(EXPORT_MIME, EXPORT_QUALITY);
                     await navigator.share({
-                        title: 'TAF',
-                        text: 'Meu print do TAF',
+                        title: 'TAFímetro',
+                        text: 'Meu print do TAFímetro',
                         url: dataUrl
                     });
                     return;

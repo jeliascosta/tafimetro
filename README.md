@@ -1,4 +1,4 @@
-# TAF
+# TAFímetro
 
 Este projeto é uma calculadora que utiliza funções para calcular notas e tempos baseados em dados de desempenho em corridas. O design é moderno e otimizado para dispositivos móveis, proporcionando uma experiência de usuário agradável.
 

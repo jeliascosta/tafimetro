@@ -125,7 +125,7 @@ const fatorSexo = [
     { teto: 60, fator: 1.210 }  //Naval
 ];
 
-const fatorNivel = { //Fatores de queda do TAF 2400M masc 34 a 39 anos
+const fatorNivel = { //Fatores de queda do TAFímetro 2400M masc 34 a 39 anos
     "A1": 1,
     "A2": 1.0741,
     "B1": 1.1481,
@@ -633,10 +633,10 @@ function calcularNota(tempo, idade, sexo, distanciaKm, ultimoTaf = 'A1') {
 // --- Função inversa: dado nota → tempo e pace ---
 function tempoEPaceParaNota(nota, idade, sexo, distanciaKm, nivel = 'A1') {
     // console.log("NÍVEL:", nivel, fatorNivel[nivel]);
-    // Aplicar multiplicador com base no último TAF
+    // Aplicar multiplicador com base no último TAFímetro
     let tempoRefSeg = tempoRefPorDistanciaExp(distanciaKm, idade, sexo);
     // console.log("TEMPO REF SEG ORIGINAL", tempoRefSeg);
-    tempoRefSeg = tempoRefSeg * fatorNivel[nivel]; //taf 30 anos masc 100 -> 80
+    tempoRefSeg = tempoRefSeg * fatorNivel[nivel]; //tafimetro 30 anos masc 100 -> 80
     // console.log("TEMPO REF SEG AJUSTADO", tempoRefSeg);
 
     const proporcao = proporcaoPorNota(nota);

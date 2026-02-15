@@ -64,8 +64,8 @@ footer sub {
     white-space: nowrap;
 }
 
-/* Estilo para a barra separadora entre distância e TAF */
-.taf-separator {
+/* Estilo para a barra separadora entre distância e TAFímetro */
+.tafimetro-separator {
     display: inline-block;
     margin: 0 2px 0 5px;
     font-weight: 300;
@@ -78,8 +78,8 @@ footer sub {
     margin-top: 5px;
 }
 
-/* Estilo para o valor do TAF no card */
-.taf-value {
+/* Estilo para o valor do TAFímetro no card */
+.tafimetro-value {
     font-family: "Roboto", "Inter", sans-serif;
     font-weight: 300;
     align-self: center;
@@ -528,7 +528,7 @@ input:checked+.slider:before {
     white-space: pre;
 }
 
-/* pequeno label de revisão ao lado de "Meu TAF" */
+/* pequeno label de revisão ao lado de "Meu TAFímetro" */
 .share-top .rev {
     font-size: 0.65em;
     margin-left: 6px;
