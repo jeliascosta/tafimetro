@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+    
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TAF</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8HJ2W33ZXE"></script>
+    <script>
+        const endLocais = ["localhost", "127.0.0.1", "192.168."];
+        const ehLocal = endLocais.some(t => location.hostname.includes(t));
+        const temNogtag = (new URLSearchParams(location.search)).has("nogtag");
+
+        if (!ehLocal && !temNogtag) {
+            console.log("Ativando gtag...");
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+            gtag('config', 'G-8HJ2W33ZXE');
+        }
+        else console.log("Desativando gtag...");
+    </script>
+</head>
+
+<body>
+    <div class="container">
+        <h1 style="margin-top: 5px;">ᯓ🏃🏻‍♀️📊 TAF <sub class="adicione" title="adicione">REV3</sub></h1>
+        <p class="instrucao-frase">📈 Insira os dados da sua <b>corrida</b> e desbrave seu card!</p>
+        <form id="calcForm">
+            <div class="input-group">
+                <!-- <label>Tipo de entrada:</label> -->
+                <div class="radio-group">
+                    <input type="radio" id="tipoTempo" name="tipoEntrada" value="tempo" checked>
+                    <label for="tipoTempo" style="margin-left: -10px;">🕒 Tempo total</label>
+                    <input type="radio" id="tipoPace" name="tipoEntrada" value="pace">
+                    <label for="tipoPace" style="margin-left: -10px;">⏱️ Pace (min/km)</label>
+                    <input type="radio" id="tipoImportar" name="tipoEntrada" value="importar">
+                    <label for="tipoImportar" style="margin-left: -10px;">➡️</label>
+                </div>
+            </div>
+
+            <div id="tempoInput">
+                <label for="tempo">🕒 (mm:ss ou hh:mm:ss):</label>
+                <input type="text" id="tempo" value="30:38">
+            </div>
+
+            <div id="paceInput" style="display: none;">
+                <label for="pace">⏱️ (mm:ss):</label>
+                <input type="text" id="pace" value="04:59">
+            </div>
+
+            <!-- Botão de importação do Strava -->
+            <div id="stravaImportContainer" style="display: none; margin: 0px 0px 0px 0px; text-align: center;">
+            <button type="button" id="stravaImportBtn" class="strava-import-btn" title="Importar dados do Strava">
+                ➡️ Importar do STRAVA
+            </button>
+            <div id="stravaStatus" style="margin: 0px 0px 10px 0px; font-size: 0.9em; color: #666;"></div>
+        </div>
+
+            <div style="display: flex; gap: 8px; align-items: flex-end;">
+                <div style="flex: 1;">
+                    <label for="idade" style="margin-bottom: 4px; display: block;">🔢 Idade:</label>
+                    <input type="number" id="idade" value="35" required style="width: 77%;">
+                </div>
+                <div style="width: 260px;">
+                    <label for="ultimoTaf"
+                        style="margin-bottom: 4px; display: block; text-align: center;font-size:0.8em">📶
+                        Hoje me considero um(a) corredor(a):</label>
+                    <select id="ultimoTaf"
+                        style="width: 100%; height: 38px; border-radius: 4px; border: 1px solid #ced4da; padding: 0 8px;">
+                        <option value="A1">ALFA 1 | Na caça do ritmo forte!</option>
+                        <option value="A2">ALFA 2 | Com um ritmo maneiro, às vezes curto um ritmo mais forte</option>
+                        <option value="B1">BRAVO 1 | Capaz de manter um ritmo maneiro (nem tão forte, nem tão
+                            light)</option>
+                        <option value="B2">BRAVO 2 | Geralmente light, curto aumentar o ritmo às vezes</option>
+                        <option value="L1" selected>LIGHT 1 | Habitual, sendo light tá safo ;)</option>
+                        <option value="L2">LIGHT 2 | Ocasional, ganhando o hábito!</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: flex-end;">
+                <div style="flex: 1;">
+                    <label for="sexo">👩 Sexo:</label>
+                    <select id="sexo" required style="width: 100%;height: 38px;">
+                        <option value="M">Masculino</option>
+                        <option value="F" selected>Feminino</option>
+                    </select>
+                </div>
+                <div style="width: 115px;">
+                    <label for="esteira"
+                        style="font-size: 0.8em; margin-bottom: 4px; display: block;text-align: center;">🏠︎ Foi na esteira?</label>
+                    <select id="esteira"
+                        style="width: 100%; height: 38px; border-radius: 4px; border: 1px solid #ced4da; padding: 0 8px;">
+                        <option value="nao" selected>Não</option>
+                        <option value="sim">Sim</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; gap: 8px; align-items: flex-end;">
+                <div style="flex: 1;">
+                    <label for="distancia" style="margin-bottom: 4px; display: block;">🛣️ Distância (km):</label>
+                    <input type="number" id="distancia" step="0.01" value="5" required style="width: 88%">
+                </div>
+                <div style="width: 180px;">
+                    <label for="intervalado"
+                        style="font-size: 0.8em; margin-bottom: 4px; display: block;text-align: center;">⏸️
+                        Teve alguma pausa total?</label>
+                    <select id="intervalado"
+                        style="width: 100%; height: 38px; border-radius: 4px; border: 1px solid #ced4da; padding: 0 8px;">
+                        <option value="nao">Não</option>
+                        <option value="sim">Sim</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="obsIntervalado"
+                style="display:none; margin: 0px 0px 15px 0px;text-align: justify;font-size: 0.8rem;">OBS: O TAF
+                (ainda) não possui um critério técnico para atribuir nota a treinos com pausa total/passiva. Caso possua
+                uma
+                sugestão de como ajustar a equivalência, entre em contato com o desenvolvedor!</div>
+
+            <!-- <button type="submit">⚡Desbrava !</button> -->
+<button type="submit" style="font-family: 'Black Ops One', sans-serif; font-size: 14px;margin-top: 12px">⚡DESBRAVE !</button>
+        </form>
+
+        <div id="resultado">
+            <div id="nota">
+                <div class="share-card" id="shareCard" style="display: none;">
+                    <div class="share-top" style="position: relative; text-align: center;margin-bottom: 2px;">
+                        <img src="img/heraldica.png" alt="Heraldica"
+                            style="position: absolute; left: calc(50% - 51px); height: 30px; width: auto; top: 50%; transform: translateY(-58%);">
+                        <div style="display: inline-block;">
+                            <span class="main">TAF<span class="rev">REV3</span></span>
+                            <div class="card-date" id="cardDate"
+                                style="font-size:.7rem;font-weight:lighter;opacity:.8;margin: 0px 0px 5px -2px">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="score-big" id="scoreBig"></div>
+                    <div id="scoreDistancia"
+                        style="display: inline-flex; justify-content: center; white-space: nowrap; font-family: 'Inter', sans-serif; font-size: 2.7rem; font-weight: 800; text-align: center; width: 100%; letter-spacing: -0.04em;padding-right: 20px;margin: -3px">
+                    </div>
+                    <div class="zone-small" id="zoneSmall"></div>
+                    <div class="card-meta"
+                        style="display:flex;gap:12px;margin-top:8px;align-items:center;justify-content:center;">
+                        <div class="meta-item" style="text-align:center">
+                            <div style="font-size:.75rem;font-weight:700;opacity:.9">🕒 Tempo</div>
+                            <div style="font-size:.95rem;font-weight:800" id="cardTempo"></div>
+                        </div>
+                        <div class="meta-item" style="text-align:center">
+                            <div style="font-size:.75rem;font-weight:700;opacity:.9">🏃🏻‍♂️‍➡️ Pace</div>
+                            <div style="font-size:.95rem;font-weight:800" id="cardPace"></div>
+                        </div>
+                        <div class="meta-item" style="text-align:center">
+                            <div style="font-size:.75rem;font-weight:700;opacity:.9;">💪 Hustle</div>
+                            <div style="font-size:.95rem;font-weight:800" id="cardHustle" class="hustle-points">-</div>
+                        </div>
+                    </div>
+                    <div class="card-corner card-corner-left"></div>
+                    <div class="card-corner card-corner-right"></div>
+                    <div class="zone-phrase" id="zonePhrase"></div>
+                </div>
+            </div>
+            <div id="opcoesCard" class="hustle-toggle-container"
+                style="display: none; justify-content: center; align-items: center; margin: 10px 0; gap: 20px;">
+                <div style="display: flex; align-items: center;">
+                    <span style="margin-right: 10px; font-weight: bold;">Mostrar Pontos Hustle:</span>
+                    <label class="switch" title="Mostrar/ocultar pontos">
+                        <input type="checkbox" id="toggleHustle" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span style="margin-right: 10px; font-weight: bold;">Mostrar Pace:</span>
+                    <label class="switch" title="Mostrar/ocultar pace">
+                        <input type="checkbox" id="togglePace" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+
+            <div id="cardActions" style="display:none;gap:8px; width:100%; align-items:stretch;">
+                <button class="compose-export" type="button" id="copyHustlePointsBtn" style="flex:1 1 0;">📑 Copiar
+                    Pontos Hustle</button>
+                <button class="compose-export" type="button" id="copyCardBtn" style="flex:1 1 0;">📋 Compartilhar
+                    Card</button>
+                <button class="compose-export" type="button" id="downloadCardBtn" style="flex:1 1 0;">💾 Baixar
+                    Card</button>
+            </div>
+
+        </div>
+
+        <div id="compositor" style="margin-top: 45px; display: none;">
+            <h3>Combine com o print do app de corrida:</h3>
+            <div class="compose-controls">
+                <input type="file" id="composeInput" accept="image/*" class="compose-upload">
+                <label id="composeScaleRow" for="composeScale"
+                    style="white-space: nowrap; display:none; align-items:center; gap:6px; width:100%;">
+                    Tamanho do card:
+                    <input type="range" id="composeScale" min="35" max="160" value="100" step="1" style="width:100%;">
+                    <span id="composeScaleLabel">100%</span>
+                </label>
+                <div id="borderRadiusControls" style="display: none; font-size: 0.8em; gap: 8px; flex-wrap: wrap;">
+                    <label id="borderRadiusLabel" style="white-space: nowrap;">
+                        Arredondar canto:</label>
+                    <div style="display: flex; gap: 8px; width: 100%;">
+                        <div style="flex: 1;">
+                            <label style="margin-bottom: 4px;">Superior
+                                esquerdo</label>
+                            <input type="range" class="border-radius-control" data-corner="top-left" min="0" max="50"
+                                value="10" style="width: 100%;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="margin-bottom: 4px;">Superior
+                                direito</label>
+                            <input type="range" class="border-radius-control" data-corner="top-right" min="0" max="50"
+                                value="10" style="width: 100%;">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; width: 100%;">
+                        <div style="flex: 1;">
+                            <label style="margin-bottom: 4px;">Inferior
+                                esquerdo</label>
+                            <input type="range" class="border-radius-control" data-corner="bottom-left" min="0" max="50"
+                                value="10" style="width: 100%;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="margin-bottom: 4px;">Inferior
+                                direito</label>
+                            <input type="range" class="border-radius-control" data-corner="bottom-right" min="0"
+                                max="50" value="10" style="width: 100%;">
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; width: 100%; margin-top: 5px;">
+                        <button type="button" id="resetBorderRadius" class="compose-export"
+                            style="flex: 1; padding: 5px; font-size: 0.8em;">↺ Redefinir Bordas</button>
+                    </div>
+                </div>
+                <div id="composeActions" style="display:none; gap:8px; width:100%; align-items:stretch;">
+                    <button type="button" id="composeShare" class="compose-export" style="flex:1 1 0;" disabled>📤
+                        Compartilhar Print</button>
+                    <button type="button" id="composeExport" class="compose-export" style="flex:1 1 0;" disabled>💾
+                        Baixar Print</button>
+                </div>
+            </div>
+            <div id="composeWrap" style="position: relative; display: inline-block;">
+                <img id="composeImg" alt="" style="max-width: 100%; height: auto; display: none;">
+                <div id="composeOverlay"
+                    style="position: absolute; inset: 0; pointer-events: auto; visibility: hidden;"></div>
+            </div>
+        </div>
+
+        <hr style="margin-top: 20px;" />
+        <!-- Seção: temposRefOrig (inserida) -->
+        <div id="tempos-ref-orig" class="tempos-ref-orig tabela-referencia">
+            <h2>Metas Top</h2>
+            <div id="temposRefOrigContent">
+                <table cellpadding="6" cellspacing="0" style="border-collapse: collapse;">
+                    <thead>
+                        <tr style="background: #eee;">
+                            <th>Distância</th>
+                            <th>Sexo</th>
+                            <th>Idade</th>
+                            <th>Tempo</th>
+                            <th>Pace / km</th>
+                        </tr>
+                    </thead>
+                    <tbody id="temposRefOrigTbody">
+                        <!-- preenchido via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Nova tabela de referência por nota -->
+        <div class="tabela-notas">
+            <h2>Nota | Tempo (<span id="distancia-ref">2.4</span>km, <span id="sexo-ref">Masc.</span> <span
+                    id="idade-ref">30</span> anos, <span id="nivel-ref">A1</span>)</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nota</th>
+                            <th>Tempo</th>
+                            <th>Pace</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaNotas">
+                        <!-- preenchido via JavaScript -->
+                        <!-- Estrutura estática: linhas serão adicionadas dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Nova seção de gráficos -->
+        <div class="seccion-graficos">
+            <h2 id="titulo-graficos">Gráficos: Nota vs Tempo, A1</h2>
+            <!-- <p class="muted">Linhas para Homens (M) e Mulheres (F).</p> -->
+
+            <div class="grid-graficos">
+                <div class="grafico-wrap">
+                    <h4>2.4 km</h4>
+                    <canvas id="chart-2-4" width="400" height="250"></canvas>
+                </div>
+
+                <div class="grafico-wrap">
+                    <h4>5 km</h4>
+                    <canvas id="chart-5" width="400" height="250"></canvas>
+                </div>
+
+                <div class="grafico-wrap">
+                    <h4>10 km</h4>
+                    <canvas id="chart-10" width="400" height="250"></canvas>
+                </div>
+
+                <div class="grafico-wrap">
+                    <h4>15 km</h4>
+                    <canvas id="chart-15" width="400" height="250"></canvas>
+                </div>
+
+                <div class="grafico-wrap" style="margin-top: 40px; padding-bottom: 50px;">
+                    <h4>Meia Maratona</h4>
+                    <canvas id="chart-meia" width="400" height="250"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- /Nova seção de gráficos -->
+
+        <div class="tabela-referencia">
+            <h2 id="titulo-referencia">Tempos de Referência para Nota 100</h2>
+            <div class="table-responsive grid-duas-tabelas">
+                <div class="tabela-wrap">
+                    <h3>Homens</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Idade</th>
+                                <th>2.4km</th>
+                                <th>5km</th>
+                                <th>10km</th>
+                                <th>15km</th>
+                                <th>Meia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaTemposM">
+                            <!-- preenchido via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tabela-wrap">
+                    <h3>Mulheres</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Idade</th>
+                                <th>2.4km</th>
+                                <th>5km</th>
+                                <th>10km</th>
+                                <th>15km</th>
+                                <th>Meia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaTemposF">
+                            <!-- preenchido via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+
+    </div>
+
+    <script src="js/calc.js"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <footer>
+        <sub>TAF: Bravura, Ritmo e Atitude para Vencer Ótimas metaS</sub>
+    </footer>
+    <!-- Biblioteca para capturar o div como imagem -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
