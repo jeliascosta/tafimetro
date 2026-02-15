@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 
-    
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -55,11 +55,11 @@
 
             <!-- Botão de importação do Strava -->
             <div id="stravaImportContainer" style="display: none; margin: 0px 0px 0px 0px; text-align: center;">
-            <button type="button" id="stravaImportBtn" class="strava-import-btn" title="Importar dados do Strava">
-                ➡️ Importar do STRAVA
-            </button>
-            <div id="stravaStatus" style="margin: 0px 0px 10px 0px; font-size: 0.9em; color: #666;"></div>
-        </div>
+                <button type="button" id="stravaImportBtn" class="strava-import-btn" title="Importar dados do Strava">
+                    ➡️ Importar do STRAVA
+                </button>
+                <div id="stravaStatus" style="margin: 0px 0px 10px 0px; font-size: 0.9em; color: #666;"></div>
+            </div>
 
             <div style="display: flex; gap: 8px; align-items: flex-end;">
                 <div style="flex: 1;">
@@ -93,7 +93,8 @@
                 </div>
                 <div style="width: 115px;">
                     <label for="esteira"
-                        style="font-size: 0.8em; margin-bottom: 4px; display: block;text-align: center;">🏠︎ Foi na esteira?</label>
+                        style="font-size: 0.8em; margin-bottom: 4px; display: block;text-align: center;">🏠︎ Foi na
+                        esteira?</label>
                     <select id="esteira"
                         style="width: 100%; height: 38px; border-radius: 4px; border: 1px solid #ced4da; padding: 0 8px;">
                         <option value="nao" selected>Não</option>
@@ -126,20 +127,21 @@
                 sugestão de como ajustar a equivalência, entre em contato com o desenvolvedor!</div>
 
             <!-- <button type="submit">⚡Desbrava !</button> -->
-<button type="submit" style="font-family: 'Black Ops One', sans-serif; font-size: 14px;margin-top: 12px">⚡DESBRAVE !</button>
+            <button type="submit"
+                style="font-family: 'Black Ops One', sans-serif; font-size: 14px;margin-top: 12px">⚡DESBRAVE !</button>
         </form>
 
         <div id="resultado">
             <div id="nota">
                 <div class="share-card" id="shareCard" style="display: none;">
                     <div class="share-top" style="position: relative; text-align: center;margin-bottom: 2px;">
-                        <img src="img/heraldica.png" alt="Heraldica"
-                            style="position: absolute; left: calc(50% - 51px); height: 30px; width: auto; top: 50%; transform: translateY(-58%);">
+                        <span class="card-decoration" style="left: calc(50% - 61px);">⚓</span>
                         <div style="display: inline-block;">
-                            <span class="main">TAFímetro<span class="rev">REV3</span></span>
+                            <span class="main">TAFímetro</span>
                             <div class="card-date" id="cardDate"
                                 style="font-size:.7rem;font-weight:lighter;opacity:.8;margin: 0px 0px 5px -2px">
                             </div>
+                            <span class="card-decoration" style="right: calc(50% - 61px);">🏃🏻‍♀️</span>
                         </div>
                     </div>
                     <div class="score-big" id="scoreBig"></div>
@@ -157,25 +159,14 @@
                             <div style="font-size:.75rem;font-weight:700;opacity:.9">🏃🏻‍♂️‍➡️ Pace</div>
                             <div style="font-size:.95rem;font-weight:800" id="cardPace"></div>
                         </div>
-                        <div class="meta-item" style="text-align:center">
-                            <div style="font-size:.75rem;font-weight:700;opacity:.9;">💪 Hustle</div>
-                            <div style="font-size:.95rem;font-weight:800" id="cardHustle" class="hustle-points">-</div>
-                        </div>
                     </div>
                     <div class="card-corner card-corner-left"></div>
                     <div class="card-corner card-corner-right"></div>
                     <div class="zone-phrase" id="zonePhrase"></div>
                 </div>
             </div>
-            <div id="opcoesCard" class="hustle-toggle-container"
-                style="display: none; justify-content: center; align-items: center; margin: 10px 0; gap: 20px;">
-                <div style="display: flex; align-items: center;">
-                    <span style="margin-right: 10px; font-weight: bold;">Mostrar Pontos Hustle:</span>
-                    <label class="switch" title="Mostrar/ocultar pontos">
-                        <input type="checkbox" id="toggleHustle" checked>
-                        <span class="slider round"></span>
-                    </label>
-                </div>
+
+            <div id="opcoesCard" style="display: none; justify-content: center; align-items: center; margin: 10px 0; gap: 20px;">
                 <div style="display: flex; align-items: center;">
                     <span style="margin-right: 10px; font-weight: bold;">Mostrar Pace:</span>
                     <label class="switch" title="Mostrar/ocultar pace">
@@ -186,8 +177,6 @@
             </div>
 
             <div id="cardActions" style="display:none;gap:8px; width:100%; align-items:stretch;">
-                <button class="compose-export" type="button" id="copyHustlePointsBtn" style="flex:1 1 0;">📑 Copiar
-                    Pontos Hustle</button>
                 <button class="compose-export" type="button" id="copyCardBtn" style="flex:1 1 0;">📋 Compartilhar
                     Card</button>
                 <button class="compose-export" type="button" id="downloadCardBtn" style="flex:1 1 0;">💾 Baixar
@@ -383,7 +372,7 @@
     <script src="js/calc.js"></script>
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+
     <footer>
         <sub>TAFímetro: Bravura, Ritmo e Atitude para Vencer Ótimas metaS</sub>
     </footer>

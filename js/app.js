@@ -433,46 +433,6 @@ class StravaIntegration {
     }
 }
 
-
-/**
- * Calcula os pontos Hustle com base na distância percorrida e nota TAFímetro
- * @param {number} distancia - Distância em quilômetros
- * @param {number} notaTAFímetro - Nota no TAFímetro (0-100)
- * @returns {number} - Pontos Hustle escalonados pela nota
- */
-function calcularPontosHustle(distancia, notaTAFímetro, idade, distanciaAtual) {
-    if (!distancia || isNaN(distancia) || !notaTAFímetro || isNaN(notaTAFímetro)) return 0;
-
-    const deltaCorrida = 0.6435; //km
-    const deltaEsteira = 0.7235; //km
-    const deltaCaminhada = 0.9655; //km
-    let deltaEsforco = deltaCorrida;
-
-    const foiNaEsteira = document.getElementById('esteira')?.value === 'sim';
-    if (foiNaEsteira)
-        deltaEsforco = deltaEsteira;
-
-    // Verificar se é treino intervalado
-    const isIntervalado = document.getElementById('intervalado')?.value === 'sim';
-
-    // Se for intervalado, retornar apenas a distância / deltaEsforco (fatorEscala = 1)
-    if (isIntervalado) {
-        return (distancia / deltaEsforco);
-    }
-
-    // Cálculo normal para treinos contínuos
-    const notaBaseF = calcularNotaPorPace("7:00", 25, 'F', distanciaAtual, "A1");
-    let notaBase = notaBaseF;
-
-    // if (notaTAFímetro < notaBase)
-    //     deltaEsforco = deltaCaminhada;
-
-    const fatorEscala = notaTAFímetro / notaBase;
-    console.log("Nota base para pts hustle:", notaBase, "fator escala:", fatorEscala)
-
-    return (distancia / deltaEsforco) * (fatorEscala > 1 ? fatorEscala : 1);
-}
-
 const tituloGraficos = document.getElementById('titulo-graficos');
 const inputIdade = document.getElementById('idade');
 
@@ -845,15 +805,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const notaInteiro = Math.max(0, Math.min(100, Math.floor(Number(nota) || 0)));
             const notaA1Inteiro = Math.max(0, Math.min(100, Math.floor(Number(notaA1) || 0)));
 
-            // Calcula os pontos Hustle
-            const pontosHustle = calcularPontosHustle(distancia, notaA1Inteiro, idade, distancia);
-
-            // Atualiza a exibição dos pontos Hustle no card
-            const cardHustle = document.getElementById('cardHustle');
-            if (cardHustle) {
-                const pontosFormatados = pontosHustle.toFixed(2).replace('.', ',');
-                cardHustle.textContent = `${pontosFormatados} pts`;
-            }
 
             // zona de exemplo: décadas, 90+ é "90-100"
             function rotuloZona(n) {
@@ -1151,7 +1102,6 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('nota').innerHTML = `<div style="color: red;">Erro: ${error.message}</div>`;
         }
 
-        setTimeout(atualizarBotaoCopiarHustle, 0); // Garante que o botão seja atualizado após o cálculo
     });
 
     preencherTabelaReferencia();
@@ -1370,10 +1320,6 @@ document.addEventListener('DOMContentLoaded', function () {
     try { configurarCompositor(); } catch (e) { console.warn('Compositor não inicializado:', e); }
 });
 
-// Adicione estes event listeners
-inputIdade.addEventListener('change', onFormInputsChange);
-inputIdade.addEventListener('input', onFormInputsChange);
-
 // Chamar a função uma vez para definir o título inicial
 onFormInputsChange();
 
@@ -1405,10 +1351,6 @@ function atualizarTabelaNotas() {
     }
 }
 
-// Adicionar event listeners para atualizar a tabela
-document.getElementById('idade').addEventListener('change', onFormInputsChange);
-document.getElementById('sexo').addEventListener('change', onFormInputsChange);
-document.getElementById('distancia').addEventListener('change', onFormInputsChange);
 
 // Inicializar a tabela
 document.addEventListener('DOMContentLoaded', onFormInputsChange);
@@ -1432,65 +1374,10 @@ function atualizarTituloReferencia() {
     }
 }
 
-// Adicionar event listeners
-document.getElementById('idade').addEventListener('change', onFormInputsChange);
-document.getElementById('sexo').addEventListener('change', onFormInputsChange);
-document.getElementById('distancia').addEventListener('change', onFormInputsChange);
-document.getElementById('ultimoTaf').addEventListener('change', onFormInputsChange);
 
-// Função para atualizar o botão de copiar pontos Hustle
-function atualizarBotaoCopiarHustle() {
-    const button = document.getElementById('copyHustlePointsBtn');
-    const cardHustle = document.getElementById('cardHustle');
-    const showHustlePoints = localStorage.getItem('showHustlePoints') !== 'false';
 
-    if (button && cardHustle) {
-        // Mostrar o botão apenas se os pontos Hustle estiverem ativos e houver pontos para copiar
-        const shouldShow = showHustlePoints && cardHustle.textContent && cardHustle.textContent.trim() !== '-';
-        button.style.display = shouldShow ? 'unset' : 'none';
 
-        // Adicionar o event listener apenas uma vez
-        if (!button.hasAttribute('data-listener-added')) {
-            button.addEventListener('click', async () => {
-                try {
-                    const hustlePoints = cardHustle.textContent.trim().replace(/[^\d,]/g, '');
-                    await navigator.clipboard.writeText(hustlePoints);
-                    alert('✅ Agora é só colar os pontos (' + hustlePoints + ') no outro app!');
-                } catch (err) {
-                    console.error('Erro ao copiar para a área de transferência:', err);
-                    alert('Falha ao copiar os pontos hustle. Tente novamente.');
-                }
-            });
-            button.setAttribute('data-listener-added', 'true');
-        }
-    }
-}
-
-// Adicionar listener para o toggle de mostrar/ocultar pontos Hustle
-document.getElementById('toggleHustle').addEventListener('change', function () {
-    const hustleContainers = document.querySelectorAll('.meta-item:has(.hustle-points)');
-    const isChecked = this.checked;
-
-    // Atualizar o botão de copiar pontos Hustle
-    atualizarBotaoCopiarHustle();
-
-    // Salvar preferência no localStorage
-    localStorage.setItem('showHustlePoints', isChecked);
-
-    // Mostrar ou ocultar todo o container de Hustle
-    hustleContainers.forEach(container => {
-        container.style.display = isChecked ? 'unset' : 'none';
-    });
-
-    // Atualizar o card de compartilhamento se estiver visível
-    const shareCard = document.getElementById('shareCard');
-    if (shareCard && shareCard.style.display !== 'none') {
-        atualizarCardOverlayDoShareCard();
-    }
-
-    // Atualizar o botão de copiar pontos Hustle
-    atualizarBotaoCopiarHustle();
-});
+// Adicionar listener para o toggle de mostrar/ocultar Pace (removido junto com hustle)
 
 // Adicionar listener para o toggle de mostrar/ocultar Pace
 document.getElementById('togglePace').addEventListener('change', function () {
@@ -1513,17 +1400,6 @@ document.getElementById('togglePace').addEventListener('change', function () {
 
 // Verificar preferências salvas ao carregar a página
 document.addEventListener('DOMContentLoaded', function () {
-    const toggleHustle = document.getElementById('toggleHustle');
-    const hustleContainers = document.querySelectorAll('.meta-item:has(.hustle-points)');
-    const savedHustlePreference = localStorage.getItem('showHustlePoints');
-    const showHustlePoints = savedHustlePreference === null ? true : savedHustlePreference === 'true';
-
-    // Aplicar preferência do Hustle
-    toggleHustle.checked = showHustlePoints;
-    hustleContainers.forEach(container => {
-        container.style.display = showHustlePoints ? 'unset' : 'none';
-    });
-
     const togglePace = document.getElementById('togglePace');
     const paceContainers = document.querySelectorAll('.meta-item:has(#cardPace)');
     const savedPacePreference = localStorage.getItem('showPace');
@@ -1534,9 +1410,6 @@ document.addEventListener('DOMContentLoaded', function () {
     paceContainers.forEach(container => {
         container.style.display = showPace ? 'unset' : 'none';
     });
-
-    // Atualizar o botão de copiar pontos Hustle
-    atualizarBotaoCopiarHustle();
 });
 
 // Inicializar o título
@@ -2133,44 +2006,6 @@ function prepararCardClonado(srcCard, clone) {
         for (const p of props) clone.style[p] = cs[p];
     } catch (_) { }
 
-    // Adicionar pontos Hustle acima da zone-phrase
-    try {
-        // Verificar se os pontos Hustle devem ser exibidos
-        const showHustlePoints = localStorage.getItem('showHustlePoints') !== 'false'; // true por padrão
-        const srcHustlePoints = srcCard.querySelector('#cardHustle');
-        const zp = clone.querySelector('.zone-phrase');
-        if (showHustlePoints && srcHustlePoints && srcHustlePoints.textContent &&
-            srcHustlePoints.textContent.trim() !== '-' && zp) {
-            const hustlePoints = srcHustlePoints.textContent.trim();
-
-            // Criar container para os pontos Hustle
-            const hustleDiv = document.createElement('div');
-            hustleDiv.className = 'hustle-points-display';
-            hustleDiv.style.textAlign = 'center';
-            hustleDiv.style.margin = '5px 0 0 0';
-            hustleDiv.style.fontSize = '1rem';
-            hustleDiv.style.fontWeight = '800';
-            hustleDiv.style.color = srcHustlePoints.style.color || '';
-
-            // Criar ícone de fogo
-            const hustleIcon = document.createElement('span');
-            hustleIcon.textContent = '💪 ';
-            hustleIcon.style.display = 'inline-block';
-
-            // Criar texto com os pontos Hustle
-            const hustleText = document.createElement('span');
-            hustleText.textContent = hustlePoints.endsWith('pts') ? hustlePoints : `${hustlePoints} pts`;
-
-            // Montar o elemento
-            hustleDiv.appendChild(hustleIcon);
-            hustleDiv.appendChild(hustleText);
-
-            // Inserir antes da zone-phrase
-            zp.parentNode.insertBefore(hustleDiv, zp);
-        }
-    } catch (e) {
-        console.error('Erro ao adicionar pontos Hustle ao card:', e);
-    }
 
     // Ajuste específico do clone: aplicar frasesPrint e espaçamento/estilos da zone-phrase para print/export
     try {
@@ -2181,7 +2016,7 @@ function prepararCardClonado(srcCard, clone) {
                 const pf = (srcCard && srcCard.dataset && srcCard.dataset.phrasePrint) || '';
                 if (pf) zp.textContent = pf;
             } catch (_) { }
-            // zp.style.marginTop = '5px'; // Reduzido para acomodar os pontos Hustle
+            // zp.style.marginTop = '5px';
             // remover blur no clone (print/export)
             zp.style.backdropFilter = 'none';
             zp.style.webkitBackdropFilter = 'none';
