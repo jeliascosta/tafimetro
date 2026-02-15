@@ -91,8 +91,7 @@ footer sub {
 /* etiquetas nos cantos inferiores do card (não interferem na altura) */
 .share-card .card-corner {
     position: absolute;
-    bottom: 43px;
-    /* acima da faixa zone-phrase */
+    bottom: 20px;
     font-size: 0.95rem;
     font-weight: 700;
     opacity: 0.9;
@@ -499,34 +498,7 @@ input:checked+.slider:before {
 }
 
 /* frase descritiva */
-.share-card .zone-phrase {
-    text-transform: uppercase;
-    font-weight: 900;
-    /* letter-spacing: 0.08em; */
-    font-size: 0.95rem;
-    white-space: nowrap;
-    /* integra ao visual do card como rodapé */
-    display: block;
-    margin-top: 8px;
-    /* expande até as bordas laterais e remove espaço inferior do padding do card */
-    margin-left: -5px;
-    /* anula padding horizontal do card (5px) */
-    margin-right: -5px;
-    margin-bottom: -10px;
-    /* anula padding inferior do card (10px) para "fechar" o card */
-    padding: 10px 12px;
-    /* mais alto para parecer uma faixa de rodapé */
-    /* zera o raio superior e herda o inferior do card */
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-    border-bottom-left-radius: inherit;
-    border-bottom-right-radius: inherit;
-    background: rgba(255, 255, 255, 0.10);
-    /* leve "pill" para destacar */
-    color: inherit;
-    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.10);
-    white-space: pre;
-}
+/* REMOVIDO */
 
 /* pequeno label de revisão ao lado de "Meu TAFímetro" */
 .share-top .rev {
@@ -643,59 +615,6 @@ input:checked+.slider:before {
 .share-card .card-meta .meta-value {
     font-size: 0.98rem;
     font-weight: 800;
-}
-
-/* Botão de importação do Strava */
-.strava-import-btn {
-    width: 100%;
-    padding: 12px 24px;
-    background-color: #fc4c02;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-.strava-import-btn:hover {
-    background-color: #e63f00;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(252, 76, 2, 0.3);
-}
-
-.strava-import-btn:active {
-    transform: translateY(0);
-}
-
-.strava-import-btn:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-}
-
-#stravaStatus {
-    min-height: 20px;
-    transition: color 0.3s ease;
-}
-
-#stravaStatus.error {
-    color: #dc3545;
-}
-
-#stravaStatus.success {
-    color: #28a745;
-}
-
-#stravaStatus.loading {
-color: #007bff;
 }
 
 /* Classe unificada para spans decorativos do card */

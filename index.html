@@ -29,7 +29,7 @@
 <body>
     <div class="container">
         <h1 style="margin-top: 5px;">⚓📊 TAFímetro 🏃🏻‍♀️🏊</h1>
-        <p class="instrucao-frase">📈 Insira os dados da sua atividade e desbrave seu card!</p>
+        <p class="instrucao-frase">📈 Insira os dados do seu TAF/treino e desbrave seu card!</p>
         <form id="calcForm">
             <div class="input-group">
                 <!-- <label>Tipo de entrada:</label> -->
@@ -38,8 +38,6 @@
                     <label for="tipoTempo" style="margin-left: -10px;">🕒 Tempo total</label>
                     <input type="radio" id="tipoPace" name="tipoEntrada" value="pace">
                     <label for="tipoPace" style="margin-left: -10px;">⏱️ Pace (min/km)</label>
-                    <input type="radio" id="tipoImportar" name="tipoEntrada" value="importar">
-                    <label for="tipoImportar" style="margin-left: -10px;">➡️</label>
                 </div>
             </div>
 
@@ -51,14 +49,6 @@
             <div id="paceInput" style="display: none;">
                 <label for="pace">⏱️ (mm:ss):</label>
                 <input type="text" id="pace" value="04:59">
-            </div>
-
-            <!-- Botão de importação do Strava -->
-            <div id="stravaImportContainer" style="display: none; margin: 0px 0px 0px 0px; text-align: center;">
-                <button type="button" id="stravaImportBtn" class="strava-import-btn" title="Importar dados do Strava">
-                    ➡️ Importar do STRAVA
-                </button>
-                <div id="stravaStatus" style="margin: 0px 0px 10px 0px; font-size: 0.9em; color: #666;"></div>
             </div>
 
             <div style="display: flex; gap: 8px; align-items: flex-end;">
@@ -162,7 +152,6 @@
                     </div>
                     <div class="card-corner card-corner-left"></div>
                     <div class="card-corner card-corner-right"></div>
-                    <div class="zone-phrase" id="zonePhrase"></div>
                 </div>
             </div>
 
@@ -374,7 +363,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <footer>
-        <sub>TAFímetro: Bravura, Ritmo e Atitude para Vencer Ótimas metaS</sub>
+        <sub>TAFímetro: jonathan.elias@marinha.mil.br</sub>
     </footer>
     <!-- Biblioteca para capturar o div como imagem -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>

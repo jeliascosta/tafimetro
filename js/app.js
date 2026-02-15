@@ -1,438 +1,5 @@
 // app.js
 
-// Configurações da API do Strava
-const STRAVA_CONFIG = {
-    clientId: '70009', // Você precisará registrar um app no Strava
-    redirectUri: window.location.origin + window.location.pathname, // Usar a página atual como callback
-    scope: 'read,activity:read_all',
-    apiUrl: 'https://www.strava.com/api/v3'
-};
-
-// Funcionalidade de integração com Strava
-class StravaIntegration {
-    constructor() {
-        this.accessToken = localStorage.getItem('strava_access_token');
-        this.refreshToken = localStorage.getItem('strava_refresh_token');
-        this.tokenExpiresAt = localStorage.getItem('strava_token_expires_at');
-        this.init();
-    }
-
-    init() {
-        const stravaBtn = document.getElementById('stravaImportBtn');
-        const stravaStatus = document.getElementById('stravaStatus');
-
-        if (stravaBtn) {
-            stravaBtn.addEventListener('click', () => this.handleStravaImport());
-        }
-
-        // Verificar se há token na URL (callback do OAuth)
-        this.handleOAuthCallback();
-    }
-
-    handleOAuthCallback() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const error = urlParams.get('error');
-
-        if (error) {
-            this.updateStatus('Erro na autenticação com Strava: ' + error, 'error');
-            return;
-        }
-
-        if (code) {
-            this.exchangeCodeForToken(code);
-            // Limpar URL
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }
-
-    async exchangeCodeForToken(code) {
-        try {
-            this.updateStatus('Autenticando com Strava...', 'loading');
-
-            const response = await fetch('https://www.strava.com/oauth/token', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    client_id: STRAVA_CONFIG.clientId,
-                    client_secret: '6f68aafcc1677901871f9d4af210c0e005c9606e', // Você precisará configurar
-                    code: code,
-                    grant_type: 'authorization_code'
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.access_token) {
-                this.accessToken = data.access_token;
-                this.refreshToken = data.refresh_token;
-                this.tokenExpiresAt = Date.now() + (data.expires_in * 1000);
-
-                localStorage.setItem('strava_access_token', this.accessToken);
-                localStorage.setItem('strava_refresh_token', this.refreshToken);
-                localStorage.setItem('strava_token_expires_at', this.tokenExpiresAt);
-
-                this.updateStatus('Autenticado com sucesso! Buscando atividades...', 'success');
-                setTimeout(() => this.fetchRecentActivities(), 1000);
-            } else {
-                throw new Error(data.error || 'Erro ao obter token');
-            }
-        } catch (error) {
-            this.updateStatus('Erro na autenticação: ' + error.message, 'error');
-        }
-    }
-
-    async handleStravaImport() {
-        if (!this.accessToken || this.isTokenExpired()) {
-            this.authenticate();
-            return;
-        }
-
-        await this.fetchRecentActivities();
-    }
-
-    authenticate() {
-        const authUrl = `https://www.strava.com/oauth/authorize?` +
-            `client_id=${STRAVA_CONFIG.clientId}&` +
-            `redirect_uri=${encodeURIComponent(STRAVA_CONFIG.redirectUri)}&` +
-            `response_type=code&` +
-            `scope=${encodeURIComponent(STRAVA_CONFIG.scope)}`;
-
-        window.location.href = authUrl;
-    }
-
-    isTokenExpired() {
-        return !this.tokenExpiresAt || Date.now() >= parseInt(this.tokenExpiresAt);
-    }
-
-    async refreshAccessToken() {
-        if (!this.refreshToken) {
-            this.authenticate();
-            return;
-        }
-
-        try {
-            const response = await fetch('https://www.strava.com/oauth/token', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    client_id: STRAVA_CONFIG.clientId,
-                    client_secret: '6f68aafcc1677901871f9d4af210c0e005c9606e',
-                    grant_type: 'refresh_token',
-                    refresh_token: this.refreshToken
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.access_token) {
-                this.accessToken = data.access_token;
-                this.tokenExpiresAt = Date.now() + (data.expires_in * 1000);
-
-                localStorage.setItem('strava_access_token', this.accessToken);
-                localStorage.setItem('strava_token_expires_at', this.tokenExpiresAt);
-
-                if (data.refresh_token) {
-                    this.refreshToken = data.refresh_token;
-                    localStorage.setItem('strava_refresh_token', this.refreshToken);
-                }
-            }
-        } catch (error) {
-            console.error('Erro ao refresh token:', error);
-            this.authenticate();
-        }
-    }
-
-    async fetchRecentActivities() {
-        if (!this.accessToken) {
-            this.authenticate();
-            return;
-        }
-
-        if (this.isTokenExpired()) {
-            await this.refreshAccessToken();
-        }
-
-        try {
-            this.updateStatus('Buscando atividades recentes...', 'loading');
-
-            const response = await fetch(`${STRAVA_CONFIG.apiUrl}/athlete/activities?per_page=10`, {
-                headers: {
-                    'Authorization': `Bearer ${this.accessToken}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Erro ao buscar atividades');
-            }
-
-            const activities = await response.json();
-            this.displayActivitySelector(activities);
-        } catch (error) {
-            this.updateStatus('Erro ao buscar atividades: ' + error.message, 'error');
-        }
-    }
-
-    displayActivitySelector(activities) {
-        // Filtrar apenas corridas
-        const runs = activities.filter(activity => activity.type === 'Run');
-        
-        if (runs.length === 0) {
-            this.updateStatus('Nenhuma corrida encontrada nas atividades recentes', 'error');
-            return;
-        }
-
-        // Limpar status ao abrir modal
-        this.updateStatus('', '');
-
-        // Criar modal de seleção
-        const modal = this.createActivityModal(runs);
-        document.body.appendChild(modal);
-    }
-
-    createActivityModal(activities) {
-        const modal = document.createElement('div');
-        modal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        `;
-
-        const content = document.createElement('div');
-        content.style.cssText = `
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 500px;
-            width: 90%;
-            height: 70vh;
-            display: flex;
-            flex-direction: column;
-        `;
-
-        // Header fixo com título
-        const header = document.createElement('div');
-        header.style.cssText = `
-            flex-shrink: 0;
-            margin-bottom: 15px;
-        `;
-        
-        const title = document.createElement('h3');
-        title.textContent = 'Selecione uma corrida:';
-        title.style.cssText = `
-            margin: 0;
-            color: #333;
-        `;
-        header.appendChild(title);
-
-        // Área de rolagem para as atividades
-        const scrollContainer = document.createElement('div');
-        scrollContainer.style.cssText = `
-            flex: 1;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            padding: 10px;
-            margin-bottom: 15px;
-        `;
-
-        const list = document.createElement('div');
-        list.id = 'activityList';
-        scrollContainer.appendChild(list);
-
-        // Footer fixo com botão cancelar
-        const footer = document.createElement('div');
-        footer.style.cssText = `
-            flex-shrink: 0;
-            text-align: center;
-        `;
-        
-        const cancelBtn = document.createElement('button');
-        cancelBtn.textContent = 'Cancelar';
-        cancelBtn.style.cssText = `
-            padding: 8px 20px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        `;
-        cancelBtn.onmouseover = () => cancelBtn.style.backgroundColor = '#5a6268';
-        cancelBtn.onmouseout = () => cancelBtn.style.backgroundColor = '#6c757d';
-        cancelBtn.onclick = () => modal.remove();
-        footer.appendChild(cancelBtn);
-
-        // Montar estrutura
-        content.appendChild(header);
-        content.appendChild(scrollContainer);
-        content.appendChild(footer);
-
-        modal.className = 'strava-modal';
-        modal.appendChild(content);
-
-        // Adicionar atividades à lista
-        activities.forEach(activity => {
-            const date = new Date(activity.start_date).toLocaleDateString('pt-BR');
-            const item = document.createElement('div');
-            item.style.cssText = `
-                padding: 12px;
-                margin: 8px 0;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                background: white;
-            `;
-            item.innerHTML = `
-                <strong>${activity.name}</strong><br>
-                <span style="font-size: 0.9em; color: #666;">
-                    📅 ${date} | 🛣️ ${(activity.distance / 1000).toFixed(2)}km | 🕒 ${this.formatTime(activity.moving_time)} | ⏱️ ${this.formatPace(activity.distance, activity.moving_time)}
-                </span>
-            `;
-            item.onmouseover = () => {
-                item.style.background = '#f8f9fa';
-                item.style.borderColor = '#007bff';
-            };
-            item.onmouseout = () => {
-                item.style.background = 'white';
-                item.style.borderColor = '#ddd';
-            };
-            item.onclick = () => {
-                this.importActivityData(activity);
-                modal.remove();
-            };
-            list.appendChild(item);
-        });
-
-        // Adicionar modal ao body
-        document.body.appendChild(modal);
-        
-        // Fechar modal ao clicar fora
-        modal.onclick = (e) => {
-            if (e.target === modal) {
-                modal.remove();
-            }
-        };
-
-        return modal;
-    }
-
-    importActivityData(activity) {
-        try {
-            // Preencher formulário com dados da atividade
-            document.getElementById('distancia').value = (activity.distance / 1000).toFixed(2);
-            
-            // Converter tempo total para formato mm:ss
-            const tempoSegundos = activity.moving_time;
-            const horas = Math.floor(tempoSegundos / 3600);
-            const minutos = Math.floor((tempoSegundos % 3600) / 60);
-            const segundos = tempoSegundos % 60;
-            
-            let tempoFormatado;
-            if (horas > 0) {
-                tempoFormatado = `${horas}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-            } else {
-                tempoFormatado = `${minutos}:${segundos.toString().padStart(2, '0')}`;
-            }
-            
-            // Preencher campo de tempo
-            document.getElementById('tempo').value = tempoFormatado;
-            
-            // Calcular e preencher campo de pace
-            const distanciaKm = activity.distance / 1000;
-            const paceSegundosPorKm = tempoSegundos / distanciaKm;
-            const paceMinutos = Math.floor(paceSegundosPorKm / 60);
-            const paceSegundos = Math.floor(paceSegundosPorKm % 60);
-            const paceFormatado = `${paceMinutos}:${paceSegundos.toString().padStart(2, '0')}`;
-            
-            document.getElementById('pace').value = paceFormatado;
-            
-            // Mudar para tipo de entrada "tempo"
-            document.querySelector('input[name="tipoEntrada"][value="tempo"]').checked = true;
-            atualizarVisibilidadeCampos();
-            
-            // Definir esteira para "Não" após importação
-            const esteiraSelect = document.getElementById('esteira');
-            if (esteiraSelect) {
-                esteiraSelect.value = 'nao';
-            }
-            
-            // Formatar data da atividade
-            const dataAtividade = new Date(activity.start_date_local);
-            const dataFormatada = dataAtividade.toLocaleDateString('pt-BR', { 
-                day: '2-digit', 
-                month: '2-digit', 
-                year: 'numeric' 
-            });
-            
-            // Formatar tempos
-            const tempoMovFormatado = this.formatTime(activity.moving_time);
-            const tempoDeslocFormatado = this.formatTime(activity.elapsed_time);
-            
-            // Comparar tempos para detectar pausas
-            const diferencaTempos = Math.abs(activity.elapsed_time - activity.moving_time);
-            if (diferencaTempos > 10)
-                alert('De acordo com o STRAVA, o tempo decorrido desta corrida foi maior que o tempo de movimentação. Lembre de indicar ao TAFímetro se houve ou não pausa total!');
-
-            this.updateStatus(`Atividade importada: ${activity.name} (${dataFormatada})<br>Distância: ${(activity.distance / 1000).toFixed(2)}km<br>Tempo de movimentação: ${tempoMovFormatado}<br>Tempo decorrido: ${tempoDeslocFormatado}`, 'success');
-            
-            // Salvar no localStorage
-            localStorage.setItem('tafimetro_distancia', document.getElementById('distancia').value);
-            localStorage.setItem('tafimetro_tempo', tempoFormatado);
-            localStorage.setItem('tafimetro_pace', paceFormatado);
-            localStorage.setItem('tafimetro_tipoEntrada', 'tempo');
-            
-        } catch (error) {
-            this.updateStatus('Erro ao importar dados: ' + error.message, 'error');
-        }
-    }
-
-    formatTime(seconds) {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-        
-        if (hours > 0) {
-            return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-        }
-        return `${minutes}:${secs.toString().padStart(2, '0')}`;
-    }
-
-    formatPace(distanceMeters, timeSeconds) {
-        const paceSeconds = timeSeconds / (distanceMeters / 1000);
-        const minutes = Math.floor(paceSeconds / 60);
-        const seconds = Math.floor(paceSeconds % 60);
-        return `${minutes}:${seconds.toString().padStart(2, '0')}/km`;
-    }
-
-    updateStatus(message, type = '') {
-        const statusEl = document.getElementById('stravaStatus');
-        if (statusEl) {
-            if (message && message.trim() !== '') {
-                statusEl.innerHTML = message;
-                statusEl.style.display = 'block';
-                statusEl.className = type;
-            } else {
-                statusEl.style.display = 'none';
-                statusEl.innerHTML = '';
-                statusEl.className = '';
-            }
-        }
-    }
-}
-
 const tituloGraficos = document.getElementById('titulo-graficos');
 const inputIdade = document.getElementById('idade');
 
@@ -518,50 +85,27 @@ function atualizarVisibilidadeCampos() {
     const tipoSelecionado = document.querySelector('input[name="tipoEntrada"]:checked').value;
     const entradaTempo = document.getElementById('tempoInput');
     const entradaPace = document.getElementById('paceInput');
-    const stravaContainer = document.getElementById('stravaImportContainer');
     
     if (tipoSelecionado === 'tempo') {
         entradaTempo.style.display = 'block';
         entradaPace.style.display = 'none';
-        stravaContainer.style.display = 'none';
         document.getElementById('tempo').required = true;
         document.getElementById('pace').required = false;
         localStorage.setItem('tafimetro_tipoEntrada', 'tempo');
     } else if (tipoSelecionado === 'pace') {
         entradaTempo.style.display = 'none';
         entradaPace.style.display = 'block';
-        stravaContainer.style.display = 'none';
         document.getElementById('tempo').required = false;
         document.getElementById('pace').required = true;
         localStorage.setItem('tafimetro_tipoEntrada', 'pace');
-    } else if (tipoSelecionado === 'importar') {
-        console.log("ENTROU AQUI")
-        entradaTempo.style.display = 'none';
-        entradaPace.style.display = 'none';
-        stravaContainer.style.display = 'block';
-        document.getElementById('tempo').required = false;
-        document.getElementById('pace').required = false;
-        localStorage.setItem('tafimetro_tipoEntrada', 'importar');
     }
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Inicializar integração com Strava
-    window.stravaIntegration = new StravaIntegration();
-    
-    // Limpar status inicial
-    const statusEl = document.getElementById('stravaStatus');
-    if (statusEl) {
-        statusEl.style.display = 'none';
-        statusEl.textContent = '';
-        statusEl.className = '';
-    }
-    
     // Controle de exibição dos campos de entrada
     const botoesRadio = document.querySelectorAll('input[name="tipoEntrada"]');
     const entradaTempo = document.getElementById('tempoInput');
     const entradaPace = document.getElementById('paceInput');
-    const stravaContainer = document.getElementById('stravaImportContainer');
 
 
 
@@ -572,27 +116,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // restaurar tipoEntrada salvo
     const tipoSalvo = localStorage.getItem('tafimetro_tipoEntrada');
-    if (tipoSalvo === 'tempo' || tipoSalvo === 'pace' || tipoSalvo === 'importar') {
+    if (tipoSalvo === 'tempo' || tipoSalvo === 'pace') {
         const rb = document.querySelector(`input[name="tipoEntrada"][value="${tipoSalvo}"]`);
         if (rb) rb.checked = true;
         if (tipoSalvo === 'tempo') {
             entradaTempo.style.display = 'block';
             entradaPace.style.display = 'none';
-            stravaContainer.style.display = 'none';
             document.getElementById('tempo').required = true;
             document.getElementById('pace').required = false;
         } else if (tipoSalvo === 'pace') {
             entradaTempo.style.display = 'none';
             entradaPace.style.display = 'block';
-            stravaContainer.style.display = 'none';
             document.getElementById('tempo').required = false;
             document.getElementById('pace').required = true;
-        } else if (tipoSalvo === 'importar') {
-            entradaTempo.style.display = 'none';
-            entradaPace.style.display = 'none';
-            stravaContainer.style.display = 'block';
-            document.getElementById('tempo').required = false;
-            document.getElementById('pace').required = false;
         }
     }
 
@@ -1067,16 +603,6 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('zoneSmall').textContent = zone;
             document.getElementById('cardTempo').textContent = displayTempo;
             document.getElementById('cardPace').textContent = `${displayPace} /km`;
-            const zonePhraseEl = document.getElementById('zonePhrase');
-            zonePhraseEl.textContent = phrase;
-
-            zonePhraseEl.style.color = ''; // resetar para cor padrão
-            // Aplicar cor rgb(254, 240, 165) quando a nota estiver entre 90 e 99
-            if (ultimoTaf.includes('A') && notaInteiro >= 90 && notaInteiro <= 100) {
-                if (ultimoTaf !== "A1" || notaInteiro < 100) {
-                    zonePhraseEl.style.color = 'rgba(242, 244, 164, 1)';
-                }
-            }
 
             // Exibe o botão copiar e opções se o card existir
             const acoesCard = document.getElementById('cardActions');
