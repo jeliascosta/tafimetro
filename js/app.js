@@ -3,6 +3,623 @@
 const tituloGraficos = document.getElementById('titulo-graficos');
 const inputIdade = document.getElementById('idade');
 
+// Tabelas de pontuação por atividade e faixa etária
+const tabelasPontuacao = {
+    'corrida2400': {
+        nome: 'Corrida 2.4km',
+        masculino: {
+            '18a25': {
+                '50': '14:30',
+                '60': '13:30',
+                '70': '12:18',
+                '80': '11:18',
+                '90': '10:12',
+                '100': '09:36'
+            },
+            '26a33': {
+                '50': '15:00',
+                '60': '14:00',
+                '70': '12:42',
+                '80': '11:42',
+                '90': '10:36',
+                '100': '10:00'
+            },
+            '34a39': {
+                '50': '15:30',
+                '60': '14:30',
+                '70': '13:24',
+                '80': '12:24',
+                '90': '11:36',
+                '100': '10:48'
+            },
+            '40a45': {
+                '50': '16:24',
+                '60': '15:36',
+                '70': '14:18',
+                '80': '13:00',
+                '90': '12:24',
+                '100': '11:36'
+            },
+            '46a49': {
+                '50': '17:30',
+                '60': '16:12',
+                '70': '15:24',
+                '80': '14:36',
+                '90': '14:00',
+                '100': '13:12'
+            },
+            '50ouMais': {
+                '50': '18:48',
+                '60': '17:24',
+                '70': '16:42',
+                '80': '16:00',
+                '90': '15:36',
+                '100': '14:48'
+            }
+        },
+        feminino: {
+            '18a25': {
+                '50': '15:40',
+                '60': '15:00',
+                '70': '14:06',
+                '80': '13:12',
+                '90': '11:48',
+                '100': '11:12'
+            },
+            '26a33': {
+                '50': '16:16',
+                '60': '15:30',
+                '70': '14:36',
+                '80': '13:42',
+                '90': '12:48',
+                '100': '12:00'
+            },
+            '34a39': {
+                '50': '16:40',
+                '60': '16:18',
+                '70': '15:36',
+                '80': '14:30',
+                '90': '13:36',
+                '100': '12:48'
+            },
+            '40a45': {
+                '50': '17:52',
+                '60': '17:18',
+                '70': '16:18',
+                '80': '15:24',
+                '90': '14:36',
+                '100': '13:36'
+            },
+            '46a49': {
+                '50': '18:58',
+                '60': '18:18',
+                '70': '17:18',
+                '80': '16:24',
+                '90': '15:24',
+                '100': '14:24'
+            },
+            '50ouMais': {
+                '50': '20:04',
+                '60': '19:30',
+                '70': '18:36',
+                '80': '17:30',
+                '90': '17:00',
+                '100': '16:00'
+            }
+        }
+    },
+    'corrida3200': {
+        nome: 'Corrida 3.2km',
+        masculino: {
+            '18a25': {
+                '50': '18:30',
+                '60': '17:20',
+                '70': '16:32',
+                '80': '15:28',
+                '90': '14:24',
+                '100': '13:04'
+            },
+            '26a33': {
+                '50': '19:00',
+                '60': '17:52',
+                '70': '17:04',
+                '80': '16:00',
+                '90': '14:56',
+                '100': '13:36'
+            },
+            '34a39': {
+                '50': '19:30',
+                '60': '18:56',
+                '70': '18:08',
+                '80': '17:04',
+                '90': '16:00',
+                '100': '14:40'
+            },
+            '40a45': {
+                '50': '20:48',
+                '60': '20:00',
+                '70': '18:24',
+                '80': '17:20',
+                '90': '16:16',
+                '100': '14:56'
+            },
+            '46a49': {
+                '50': '22:24',
+                '60': '21:36',
+                '70': '19:44',
+                '80': '18:40',
+                '90': '17:36',
+                '100': '16:16'
+            },
+            '50a54': {
+                '50': '22:56',
+                '60': '22:08',
+                '70': '20:16',
+                '80': '19:12',
+                '90': '18:08',
+                '100': '16:48'
+            },
+            '55ouMais': {
+                '50': '23:28',
+                '60': '21:40',
+                '70': '20:48',
+                '80': '19:44',
+                '90': '18:40',
+                '100': '17:20'
+            }
+        },
+        feminino: {
+            '18a25': {
+                '50': '20:30',
+                '60': '17:36',
+                '70': '17:04',
+                '80': '16:32',
+                '90': '16:00',
+                '100': '15:12'
+            },
+            '26a33': {
+                '50': '21:00',
+                '60': '19:12',
+                '70': '18:40',
+                '80': '17:52',
+                '90': '17:04',
+                '100': '16:00'
+            },
+            '34a39': {
+                '50': '21:30',
+                '60': '20:16',
+                '70': '19:44',
+                '80': '18:56',
+                '90': '18:08',
+                '100': '17:04'
+            },
+            '40a45': {
+                '50': '23:20',
+                '60': '22:24',
+                '70': '21:36',
+                '80': '20:32',
+                '90': '19:28',
+                '100': '18:24'
+            },
+            '49a49': {
+                '50': '24:32',
+                '60': '23:44',
+                '70': '22:56',
+                '80': '21:52',
+                '90': '20:48',
+                '100': '19:44'
+            },
+            '50a54': {
+                '50': '26:40',
+                '60': '25:52',
+                '70': '24:32',
+                '80': '23:12',
+                '90': '21:52',
+                '100': '20:32'
+            },
+            '55ouMais': {
+                '50': '27:28',
+                '60': '26:24',
+                '70': '25:04',
+                '80': '23:44',
+                '90': '22:24',
+                '100': '21:04'
+            }
+        }
+    },
+    'natacao50': {
+        nome: 'Natação 50m',
+        masculino: {
+            '18a30': {
+                '50': '01:30',
+                '60': '01:20',
+                '70': '01:10',
+                '80': '01:00',
+                '90': '00:50',
+                '100': '00:40'
+            },
+            '31a40': {
+                '50': '01:35',
+                '60': '01:25',
+                '70': '01:15',
+                '80': '01:05',
+                '90': '00:55',
+                '100': '00:45'
+            },
+            '41a49': {
+                '50': '01:40',
+                '60': '01:30',
+                '70': '01:20',
+                '80': '01:10',
+                '90': '01:00',
+                '100': '00:50'
+            },
+            '50ouMais': {
+                '50': '01:45',
+                '60': '01:35',
+                '70': '01:25',
+                '80': '01:15',
+                '90': '01:05',
+                '100': '00:55'
+            }
+        },
+        feminino: {
+            '18a30': {
+                '50': '02:20',
+                '60': '02:10',
+                '70': '02:00',
+                '80': '01:50',
+                '90': '01:40',
+                '100': '01:30'
+            },
+            '31a40': {
+                '50': '02:25',
+                '60': '02:15',
+                '70': '02:05',
+                '80': '01:55',
+                '90': '01:45',
+                '100': '01:35'
+            },
+            '41a49': {
+                '50': '02:30',
+                '60': '02:20',
+                '70': '02:10',
+                '80': '02:00',
+                '90': '01:50',
+                '100': '01:40'
+            },
+            '50ouMais': {
+                '50': '02:35',
+                '60': '02:25',
+                '70': '02:15',
+                '80': '02:05',
+                '90': '01:55',
+                '100': '01:45'
+            }
+        }
+    },
+    'natacao100': {
+        nome: 'Natação 100m',
+        masculino: {
+            '18a30': {
+                '50': '03:20',
+                '60': '03:00',
+                '70': '02:40',
+                '80': '02:20',
+                '90': '02:00',
+                '100': '01:40'
+            },
+            '31a40': {
+                '50': '03:30',
+                '60': '03:10',
+                '70': '02:50',
+                '80': '02:30',
+                '90': '02:10',
+                '100': '01:50'
+            },
+            '41a49': {
+                '50': '03:40',
+                '60': '03:20',
+                '70': '03:00',
+                '80': '02:40',
+                '90': '02:20',
+                '100': '02:00'
+            },
+            '50ouMais': {
+                '50': '03:50',
+                '60': '03:30',
+                '70': '03:10',
+                '80': '02:50',
+                '90': '02:30',
+                '100': '02:10'
+            }
+        },
+        feminino: {
+            '18a30': {
+                '50': '04:00',
+                '60': '03:40',
+                '70': '03:20',
+                '80': '03:00',
+                '90': '02:40',
+                '100': '02:20'
+            },
+            '31a40': {
+                '50': '04:10',
+                '60': '03:50',
+                '70': '03:30',
+                '80': '03:10',
+                '90': '02:50',
+                '100': '02:30'
+            },
+            '41a49': {
+                '50': '04:20',
+                '60': '04:00',
+                '70': '03:40',
+                '80': '03:20',
+                '90': '03:00',
+                '100': '02:40'
+            },
+            '50ouMais': {
+                '50': '04:30',
+                '60': '04:10',
+                '70': '03:50',
+                '80': '03:30',
+                '90': '03:10',
+                '100': '02:50'
+            }
+        }
+    },
+    'caminhada4800': {
+        nome: 'Caminhada 4.8km',
+        masculino: {
+            '18a25': {
+                '50': '48:00',
+                '60': '46:00',
+                '70': '44:00',
+                '80': '42:00',
+                '90': '40:00',
+                '100': '38:00'
+            },
+            '26a33': {
+                '50': '49:00',
+                '60': '47:00',
+                '70': '45:00',
+                '80': '43:00',
+                '90': '41:00',
+                '100': '39:00'
+            },
+            '34a39': {
+                '50': '51:00',
+                '60': '48:00',
+                '70': '46:00',
+                '80': '44:00',
+                '90': '42:00',
+                '100': '40:00'
+            },
+            '40a45': {
+                '50': '54:00',
+                '60': '51:00',
+                '70': '48:00',
+                '80': '46:00',
+                '90': '44:00',
+                '100': '42:00'
+            },
+            '49a49': {
+                '50': '56:00',
+                '60': '53:00',
+                '70': '50:00',
+                '80': '47:00',
+                '90': '45:00',
+                '100': '43:00'
+            },
+            '50ouMais': {
+                '50': '58:00',
+                '60': '55:00',
+                '70': '52:00',
+                '80': '49:00',
+                '90': '47:00',
+                '100': '45:00'
+            }
+        },
+        feminino: {
+            '18a25': {
+                '50': '49:00',
+                '60': '47:00',
+                '70': '45:00',
+                '80': '43:00',
+                '90': '41:00',
+                '100': '39:00'
+            },
+            '26a33': {
+                '50': '51:00',
+                '60': '48:00',
+                '70': '46:00',
+                '80': '44:00',
+                '90': '42:00',
+                '100': '40:00'
+            },
+            '34a39': {
+                '50': '54:00',
+                '60': '51:00',
+                '70': '48:00',
+                '80': '46:00',
+                '90': '44:00',
+                '100': '42:00'
+            },
+            '40a45': {
+                '50': '56:00',
+                '60': '53:00',
+                '70': '50:00',
+                '80': '47:00',
+                '90': '45:00',
+                '100': '43:00'
+            },
+            '46a49': {
+                '50': '58:00',
+                '60': '55:00',
+                '70': '52:00',
+                '80': '49:00',
+                '90': '47:00',
+                '100': '45:00'
+            },
+            '50ouMais': {
+                '50': '60:00',
+                '60': '57:00',
+                '70': '54:00',
+                '80': '51:00',
+                '90': '49:00',
+                '100': '47:00'
+            }
+        }
+    }
+    ,
+};
+
+// Função para obter faixa etária do usuário
+function obterFaixaEtaria(idade, atividade) {
+    // Natação usa faixas diferentes da corrida
+    if (atividade === 'natacao50' || atividade === 'natacao100') {
+        if (idade <= 30) return '18a30';
+        if (idade <= 40) return '31a40';
+        if (idade <= 49) return '41a49';
+        return '50ouMais';
+    }
+
+    // Corrida 2.4km e Caminhada 4.8km usam 6 faixas
+    if (atividade === 'corrida2400' || atividade === 'caminhada4800') {
+        if (idade <= 25) return '18a25';
+        if (idade <= 33) return '26a33';
+        if (idade <= 39) return '34a39';
+        if (idade <= 45) return '40a45';
+        if (idade <= 49) return '46a49';
+        return '50ouMais';
+    }
+
+    // Corrida 3.2km usa 7 faixas
+    if (atividade === 'corrida3200') {
+        if (idade <= 25) return '18a25';
+        if (idade <= 33) return '26a33';
+        if (idade <= 39) return '34a39';
+        if (idade <= 45) return '40a45';
+        if (idade <= 49) return '46a49';
+        if (idade <= 54) return '50a54';
+        return '55ouMais';
+    }
+}
+
+// Função para calcular nota baseada nas novas tabelas
+function calcularNotaPorTabela(tempo, idade, sexo, atividade) {
+    const faixaEtaria = obterFaixaEtaria(idade, atividade);
+    const tabela = tabelasPontuacao[atividade];
+
+    // Converter sexo do select para o formato da tabela
+    const sexoTabela = sexo === 'M' ? 'masculino' : 'feminino';
+
+    if (!tabela || !tabela[sexoTabela] || !tabela[sexoTabela][faixaEtaria]) {
+        console.warn('Tabela não encontrada para atividade:', atividade, 'sexo:', sexo, 'faixa:', faixaEtaria);
+        return 0;
+    }
+
+    const pontosFaixa = tabela[sexoTabela][faixaEtaria];
+    const tempoSegundos = tempoStringParaSegundos(tempo);
+
+    // Encontrar os pontos mais próximos para interpolação
+    const pontos = Object.keys(pontosFaixa).map(Number).sort((a, b) => a - b);
+
+    if (pontos.length === 0) return 0;
+
+    // Verificar se o tempo é muito lento (maior que o tempo para 50 pontos)
+    const tempo50pontos = tempoStringParaSegundos(pontosFaixa[50]);
+    if (tempoSegundos > tempo50pontos) {
+        return 0;
+    }
+
+    // Se o tempo for exatamente um dos tempos da tabela
+    for (const ponto of pontos) {
+        if (Math.abs(tempoStringParaSegundos(pontosFaixa[ponto]) - tempoSegundos) < 0.5) {
+            return ponto;
+        }
+    }
+
+    // Interpolação linear entre os dois pontos mais próximos
+    return interpolarPontos(tempoSegundos, pontos, pontosFaixa);
+}
+
+// Função para interpolar linearmente entre pontos
+function interpolarPontos(tempoSegundos, pontos, temposPorPonto) {
+    if (pontos.length === 1) {
+        return pontos[0];
+    }
+
+    // Encontrar os pontos que envolvem o tempo
+    let pontoInferior = null;
+    let pontoSuperior = null;
+
+    for (let i = 0; i < pontos.length - 1; i++) {
+        const tempoAtual = tempoStringParaSegundos(temposPorPonto[pontos[i]]);
+        const proximoTempo = tempoStringParaSegundos(temposPorPonto[pontos[i + 1]]);
+
+        // Para corrida: tempos menores = notas maiores
+        // Verificar se o tempo está entre os dois pontos (invertido)
+        if (tempoSegundos <= tempoAtual && tempoSegundos >= proximoTempo) {
+            pontoInferior = pontos[i];
+            pontoSuperior = pontos[i + 1];
+            break;
+        }
+    }
+
+    if (!pontoInferior || !pontoSuperior) {
+        // Se estiver fora dos limites
+        // Para corrida: tempos menores = notas maiores
+        if (tempoSegundos <= tempoStringParaSegundos(temposPorPonto[pontos[0]])) {
+            // Melhor que todos os tempos - extrapolar usando taxa 90-100
+            let ponto90 = null;
+            let ponto100 = null;
+            
+            for (let i = 0; i < pontos.length - 1; i++) {
+                if (pontos[i] === 90 && pontos[i + 1] === 100) {
+                    ponto90 = pontos[i];
+                    ponto100 = pontos[i + 1];
+                    break;
+                }
+            }
+            
+            if (ponto90 && ponto100) {
+                const tempo90 = tempoStringParaSegundos(temposPorPonto[ponto90]);
+                const tempo100 = tempoStringParaSegundos(temposPorPonto[ponto100]);
+                
+                // Taxa de crescimento: 10 pontos por (tempo90 - tempo100) segundos
+                const taxaPorSegundo = 10 / (tempo90 - tempo100);
+                
+                // Calcular quanto tempo o usuário foi melhor que o tempo de 100 pontos
+                const diferencaTempo = tempo100 - tempoSegundos;
+                
+                // Nota extrapolada: 100 + (diferencaTempo * taxaPorSegundo)
+                const notaExtrapolada = 100 + (diferencaTempo * taxaPorSegundo);
+                
+                return Math.round(notaExtrapolada * 100) / 100;
+            }
+            
+            return pontos[0]; // Fallback
+        }
+        
+        // Pior que todos os tempos
+        return pontos[pontos.length - 1];
+    }
+
+    // Interpolação linear para corrida (tempos menores = notas maiores)
+    const tempoInferior = tempoStringParaSegundos(temposPorPonto[pontoInferior]);
+    const tempoSuperior = tempoStringParaSegundos(temposPorPonto[pontoSuperior]);
+    const pontoInferiorNum = pontoInferior;
+    const pontoSuperiorNum = pontoSuperior;
+
+    // Para corrida: proporção invertida
+    const proporcao = (tempoInferior - tempoSegundos) / (tempoInferior - tempoSuperior);
+    const notaInterpolada = pontoInferiorNum + proporcao * (pontoSuperiorNum - pontoInferiorNum);
+
+    return Math.round(notaInterpolada * 100) / 100; // Arredondar para 2 casas decimais
+}
+
 // Função para atualizar emojis e texto baseado no sexo selecionado
 function atualizarEmojisPorSexo(sexo) {
     // Atualiza emoji no label do campo sexo
@@ -12,16 +629,12 @@ function atualizarEmojisPorSexo(sexo) {
     }
 
     // Atualiza emoji no título TAFímetro
-    const tituloTAFímetro = document.querySelector('h1');
-    if (tituloTAFímetro) {
+    const tituloEmojis = document.getElementById('tituloEmojis');
+    if (tituloEmojis) {
         const emojiCorredor = sexo === 'M' ? '🏃🏻‍♂️' : '🏃🏻‍♀️';
-        // Substitui o emoji do corredor mantendo o resto do conteúdo
-        const textoAtual = tituloTAFímetro.innerHTML;
-        // Substitui tanto o emoji masculino quanto feminino do corredor
-        const textoNovo = textoAtual
-            .replace(/🏃🏻‍♀️/g, emojiCorredor)
-            .replace(/🏃🏻‍♂️/g, emojiCorredor);
-        tituloTAFímetro.innerHTML = textoNovo;
+        const emojiNatacao = sexo === 'M' ? '🏊‍♂️' : '🏊‍♀️';
+        // Atualiza apenas o span com os emojis
+        tituloEmojis.textContent = `${emojiCorredor}${emojiNatacao}`;
     }
 
     // Atualiza a frase de instrução
@@ -30,6 +643,32 @@ function atualizarEmojisPorSexo(sexo) {
         const genero = sexo === 'M' ? 'Desbravador' : 'Desbravadora';
         instrucaoFrase.textContent = `📈 ${genero}, insira os dados da sua corrida!`;
     }
+
+    // Atualizar emoji da atividade
+    atualizarEmojiAtividade();
+}
+
+// Função para atualizar emoji da atividade
+function atualizarEmojiAtividade() {
+    const atividadeSelect = document.getElementById('atividade');
+    const sexoSelect = document.getElementById('sexo');
+    const labelAtividade = document.querySelector('label[for="atividade"]');
+
+    if (!atividadeSelect || !sexoSelect || !labelAtividade) return;
+
+    const atividade = atividadeSelect.value;
+    const sexo = sexoSelect.value;
+
+    const emojis = {
+        'corrida2400': sexo === 'M' ? '🏃‍♂️' : '🏃‍♀️',
+        'corrida3200': sexo === 'M' ? '🏃‍♂️' : '🏃‍♀️',
+        'natacao50': sexo === 'M' ? '🏊‍♂️' : '🏊‍♀️',
+        'natacao100': sexo === 'M' ? '🏊‍♂️' : '🏊‍♀️',
+        'caminhada4800': sexo === 'M' ? '🚶‍♂️' : '🚶‍♀️'
+    };
+
+    const emoji = emojis[atividade] || '🏃';
+    labelAtividade.innerHTML = `${emoji} Atividade:`;
 }
 
 // Preenche tabela de referência para um sexo específico em um tbody dado
@@ -51,8 +690,7 @@ function preencherTabelaParaSexo(tbodyId, sexoReferencia) {
 
         for (const d of distancias) {
             try {
-                const ultimoTaf = document.getElementById('ultimoTaf')?.value || 'A1';
-                const { tempo, pace } = tempoEPaceParaNota(100, idade, sexoReferencia, d.km, ultimoTaf);
+                const { tempo, pace } = tempoEPaceParaNota(100, idade, sexoReferencia, d.km, 'A1');
                 rowHtml += `<td class="ref-cell"><div class="ref-tempo">${tempo}</div><div class="ref-pace">${pace}</div></td>`;
             } catch (err) {
                 rowHtml += `<td class="ref-cell"><div class="ref-tempo">--</div><div class="ref-pace">--</div></td>`;
@@ -74,88 +712,42 @@ function preencherTabelaReferencia() {
     }
 }
 
-// Função helper para obter distância formatada para 1 casa decimal (usada nos cálculos)
+// Função helper para obter distância formatada da atividade selecionada
 function obterDistanciaFormatada() {
-    const valor = parseFloat(document.getElementById('distancia').value);
-    return !isNaN(valor) ? parseFloat(valor/*.toFixed(1)*/) : valor;
-}
+    const atividadeSelect = document.getElementById('atividade');
+    if (!atividadeSelect) return 2.4; // valor padrão
 
-// Função global para atualizar visibilidade dos campos
-function atualizarVisibilidadeCampos() {
-    const tipoSelecionado = document.querySelector('input[name="tipoEntrada"]:checked').value;
-    const entradaTempo = document.getElementById('tempoInput');
-    const entradaPace = document.getElementById('paceInput');
-    
-    if (tipoSelecionado === 'tempo') {
-        entradaTempo.style.display = 'block';
-        entradaPace.style.display = 'none';
-        document.getElementById('tempo').required = true;
-        document.getElementById('pace').required = false;
-        localStorage.setItem('tafimetro_tipoEntrada', 'tempo');
-    } else if (tipoSelecionado === 'pace') {
-        entradaTempo.style.display = 'none';
-        entradaPace.style.display = 'block';
-        document.getElementById('tempo').required = false;
-        document.getElementById('pace').required = true;
-        localStorage.setItem('tafimetro_tipoEntrada', 'pace');
-    }
+    const distancias = {
+        'corrida2400': 2.4,
+        'corrida3200': 3.2,
+        'natacao50': 0.05,
+        'natacao100': 0.1,
+        'caminhada4800': 4.8
+    };
+
+    const atividade = atividadeSelect.value;
+    return distancias[atividade] || 2.4;
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Controle de exibição dos campos de entrada
-    const botoesRadio = document.querySelectorAll('input[name="tipoEntrada"]');
-    const entradaTempo = document.getElementById('tempoInput');
-    const entradaPace = document.getElementById('paceInput');
-
-
-
-    // Adicionar listeners aos radio buttons
-    botoesRadio.forEach(radio => {
-        radio.addEventListener('change', atualizarVisibilidadeCampos);
-    });
-
-    // restaurar tipoEntrada salvo
-    const tipoSalvo = localStorage.getItem('tafimetro_tipoEntrada');
-    if (tipoSalvo === 'tempo' || tipoSalvo === 'pace') {
-        const rb = document.querySelector(`input[name="tipoEntrada"][value="${tipoSalvo}"]`);
-        if (rb) rb.checked = true;
-        if (tipoSalvo === 'tempo') {
-            entradaTempo.style.display = 'block';
-            entradaPace.style.display = 'none';
-            document.getElementById('tempo').required = true;
-            document.getElementById('pace').required = false;
-        } else if (tipoSalvo === 'pace') {
-            entradaTempo.style.display = 'none';
-            entradaPace.style.display = 'block';
-            document.getElementById('tempo').required = false;
-            document.getElementById('pace').required = true;
-        }
-    }
-
-    // Estado inicial - chamar depois da restauração
-    atualizarVisibilidadeCampos();
-
     const tEl = document.getElementById('tempo');
-    const pEl = document.getElementById('pace');
     const iEl = document.getElementById('idade');
-    const dEl = document.getElementById('distancia');
     const sEl = document.getElementById('sexo');
+    const aEl = document.getElementById('atividade');
     const vT = localStorage.getItem('tafimetro_tempo');
-    const vP = localStorage.getItem('tafimetro_pace');
     const vI = localStorage.getItem('tafimetro_idade');
-    const vD = localStorage.getItem('tafimetro_distancia');
     const vS = localStorage.getItem('tafimetro_sexo');
-    const vUltimoTaf = localStorage.getItem('tafimetro_ultimoTaf');
+    const vA = localStorage.getItem('tafimetro_atividade');
     if (tEl && vT != null) tEl.value = vT;
-    if (pEl && vP != null) pEl.value = vP;
     if (iEl && vI != null) iEl.value = vI;
-    if (dEl && vD != null) dEl.value = vD;
     if (sEl && vS != null) sEl.value = vS;
-    if (document.getElementById('ultimoTaf') && vUltimoTaf != null) document.getElementById('ultimoTaf').value = vUltimoTaf;
+    if (aEl && vA != null) aEl.value = vA;
     if (tEl) tEl.addEventListener('input', () => localStorage.setItem('tafimetro_tempo', tEl.value || ''));
-    if (pEl) pEl.addEventListener('input', () => localStorage.setItem('tafimetro_pace', pEl.value || ''));
     if (iEl) iEl.addEventListener('change', () => localStorage.setItem('tafimetro_idade', iEl.value || ''));
-    if (dEl) dEl.addEventListener('change', () => localStorage.setItem('tafimetro_distancia', dEl.value || ''));
+    if (aEl) aEl.addEventListener('change', () => {
+        localStorage.setItem('tafimetro_atividade', aEl.value || '');
+        atualizarEmojiAtividade();
+    });
     if (sEl) {
         sEl.addEventListener('change', () => {
             localStorage.setItem('tafimetro_sexo', sEl.value || '');
@@ -165,37 +757,31 @@ document.addEventListener('DOMContentLoaded', function () {
         atualizarEmojisPorSexo(sEl.value);
     }
 
-    // Adicionar listener para salvar a seleção do Último TAFímetro e atualizar o card, tabelas e gráficos
-    const ultimoTafEl = document.getElementById('ultimoTaf');
-    if (ultimoTafEl) {
-        ultimoTafEl.addEventListener('change', () => {
-            const valorTaf = ultimoTafEl.value || '';
-            localStorage.setItem('tafimetro_ultimoTaf', valorTaf);
-
-            // Atualiza o card
-            if (typeof atualizarCardOverlayDoShareCard === 'function') {
-                atualizarCardOverlayDoShareCard();
+    // Handler para toggle da faixa etária
+    const toggleFaixa = document.getElementById('toggleFaixa');
+    if (toggleFaixa) {
+        // Carregar estado salvo do localStorage
+        const savedState = localStorage.getItem('tafimetro_mostrarFaixa');
+        if (savedState !== null) {
+            toggleFaixa.checked = savedState === 'true';
+        }
+        
+        toggleFaixa.addEventListener('change', () => {
+            const scoreFaixaEtaria = document.getElementById('scoreFaixaEtaria');
+            if (scoreFaixaEtaria) {
+                scoreFaixaEtaria.style.display = toggleFaixa.checked ? 'flex' : 'none';
             }
-
-            // Atualiza as tabelas de referência
-            preencherTabelaReferencia();
-
-            // Atualiza a tabela de notas
-            if (typeof atualizarTabelaNotas === 'function') {
-                atualizarTabelaNotas();
-            }
-
-            // Atualiza os gráficos
-            if (typeof gerarGraficos === 'function') {
-                gerarGraficos();
-            }
-
-            // Atualiza o título dos gráficos
-            if (typeof atualizarTituloGraficos === 'function') {
-                atualizarTituloGraficos();
-            }
+            // Salvar estado no localStorage
+            localStorage.setItem('tafimetro_mostrarFaixa', toggleFaixa.checked);
         });
+        
+        // Aplicar estado inicial
+        const scoreFaixaEtaria = document.getElementById('scoreFaixaEtaria');
+        if (scoreFaixaEtaria) {
+            scoreFaixaEtaria.style.display = toggleFaixa.checked ? 'flex' : 'none';
+        }
     }
+
 
     // Handler para copiar/baixar somente o card (movido do index.html)
     const btnShareCard = document.getElementById('copyCardBtn');
@@ -253,10 +839,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Salvar os estilos originais
                 const card = document.getElementById('shareCard');
                 const originalBorderRadius = card.style.borderRadius;
-                
+
                 // Remover border-radius temporariamente
                 card.style.borderRadius = '0';
-                
+
                 const canvas = await html2canvas(card, {
                     scale: 3,
                     backgroundColor: null,
@@ -297,149 +883,110 @@ document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('calcForm').addEventListener('submit', function (e) {
         e.preventDefault();
 
-        const tipoEntrada = document.querySelector('input[name="tipoEntrada"]:checked').value;
+        // Atualizar emoji do card com base na atividade e sexo selecionados
+        const atividadeSelect = document.getElementById('atividade');
+        const sexoSelect = document.getElementById('sexo');
+        const cardEmojiDireita = document.getElementById('cardEmojiDireita');
+
+        if (atividadeSelect && sexoSelect && cardEmojiDireita) {
+            const atividade = atividadeSelect.value;
+            const sexo = sexoSelect.value;
+
+            const emojis = {
+                'corrida2400': sexo === 'M' ? '🏃‍♂️' : '🏃‍♀️',
+                'corrida3200': sexo === 'M' ? '🏃‍♂️' : '🏃‍♀️',
+                'natacao50': sexo === 'M' ? '🏊‍♂️' : '🏊‍♀️',
+                'natacao100': sexo === 'M' ? '🏊‍♂️' : '🏊‍♀️',
+                'caminhada4800': sexo === 'M' ? '🚶‍♂️' : '🚶‍♀️'
+            };
+
+            const emoji = emojis[atividade] || '🏃';
+            cardEmojiDireita.textContent = emoji;
+        }
+
         const idade = parseInt(document.getElementById('idade').value);
         const sexo = document.getElementById('sexo').value;
         const distancia = obterDistanciaFormatada();
 
-        // Verificar se o pace é menor que 2:50
-        let paceSegundos = 0;
-
-        if (tipoEntrada === 'tempo') {
-            const tempo = document.getElementById('tempo').value;
-            const distancia = parseFloat(document.getElementById('distancia').value);
-            if (distancia > 0) {
-                const tempoSegundos = tempoStringParaSegundos(tempo);
-                paceSegundos = tempoSegundos / distancia;
-            }
-        } else {
-            const pace = document.getElementById('pace').value;
-            paceSegundos = tempoStringParaSegundos(pace);
-        }
-
-        // 2:30 em segundos = 170 segundos
-        if (paceSegundos > 0 && paceSegundos < 150) {
-            alert('Pace menor que 02:30?!! Melhor que o Kipchoge?!! 👀 Olha o golpe hein... 😅 Verifique!');
-            return false;
-        }
-
         try {
             let nota;
             let notaA1;
-            const ultimoTaf = document.getElementById('ultimoTaf')?.value || 'A1';
-            if (tipoEntrada === 'tempo') {
-                const tempo = document.getElementById('tempo').value;
-                nota = calcularNota(tempo, idade, sexo, distancia, ultimoTaf);
-                notaA1 = calcularNota(tempo, idade, sexo, distancia, "A1");
-            } else {
-                const pace = document.getElementById('pace').value;
-                nota = calcularNotaPorPace(pace, idade, sexo, distancia, ultimoTaf);
-                notaA1 = calcularNotaPorPace(pace, idade, sexo, distancia, "A1");
-            }
+            const tempo = document.getElementById('tempo').value;
+            const atividade = document.getElementById('atividade').value;
+            
+            // Obter nome da atividade para exibição
+            const nomesAtividade = {
+                'corrida2400': 'Corrida 2.4km',
+                'corrida3200': 'Corrida 3.2km',
+                'natacao50': 'Natação 50m',
+                'natacao100': 'Natação 100m',
+                'caminhada4800': 'Caminhada 4.8km'
+            };
+            const atividadeNome = nomesAtividade[atividade] || 'Atividade';
+
+            // Obter faixa etária para exibição
+            const faixaEtaria = obterFaixaEtaria(idade, atividade);
+            const nomesFaixaEtaria = {
+                '18a25': 'Faixa: 18 a 25 anos',
+                '18a30': 'Faixa: 18 a 30 anos',
+                '26a33': 'Faixa: 26 a 33 anos',
+                '31a40': 'Faixa: 31 a 40 anos',
+                '34a39': 'Faixa: 34 a 39 anos',
+                '41a49': 'Faixa: 41 a 49 anos',
+                '40a45': 'Faixa: 40 a 45 anos',
+                '46a49': 'Faixa: 46 a 49 anos',
+                '49a49': 'Faixa: 49 anos',
+                '50a54': 'Faixa: 50 a 54 anos',
+                '50ouMais': 'Faixa: 50 anos ou mais',
+                '55ouMais': 'Faixa: 55 anos ou mais',
+                '60ouMais': 'Faixa: 60 anos ou mais'
+            };
+            const faixaEtariaNome = nomesFaixaEtaria[faixaEtaria] || faixaEtaria;
+
+            // Usar novo sistema de cálculo baseado em tabelas
+            nota = calcularNotaPorTabela(tempo, idade, sexo, atividade);
+            notaA1 = nota; // No novo sistema, não há diferença entre níveis
 
             // Renderiza a "share card" estilo app de corrida
-            const notaInteiro = Math.max(0, Math.min(100, Math.floor(Number(nota) || 0)));
-            const notaA1Inteiro = Math.max(0, Math.min(100, Math.floor(Number(notaA1) || 0)));
+            const notaInteiro = Math.max(0, Math.floor(Number(nota) || 0));
+            const notaA1Inteiro = Math.max(0, Math.floor(Number(notaA1) || 0));
 
 
             // zona de exemplo: décadas, 90+ é "90-100"
             function rotuloZona(n) {
-                if (n === 100) return '100';
+                if (n >= 100) return '100+';
                 if (n >= 90) return '90-99';
-                const low = Math.floor(n / 10) * 10;
-                const high = low + 9;
-                return `${low}-${high}`;
+                return '60-69';
             }
 
-            let frasesHomem = {
-                '50-59': '😁 VIBRANDO!!! 😁',
-                '60-69': '🎯💪 ZONA 2, TÁ PAGO!! 💪🎯',
-                '70-79': '🏃‍♂️👏 SHOWD CADÊNCIA! 👏🏃‍♂️',
-                '80-89': '🔥🏃‍♂️👉 Q TREINO TOP! 👈🏃‍♂️🔥',
+            // Definir frases por sexo
+            const frasesHomem = {
+                '0-59': '💪 Continue treinando! 💪',
+                '60-69': '📈 Melhorando! 📈',
+                '70-79': '👍 Bom progresso! 👍',
+                '80-89': '🔥 Ótimo desempenho! 🔥',
+                '90-99': '⚡ DANGER ZONE ⚡',
+                '100': '💯😂 DE BIKE, CTZ 😂',
+                '100+': '🚀 EXTRATERRESTRE! �'
+            };
+
+            const frasesMulher = {
+                '0-59': '💪 Continue treinando! 💪',
+                '60-69': '📈 Melhorando! 📈',
+                '70-79': '👍 Bom progresso! 👍',
+                '80-89': '🔥 Ótimo desempenho! 🔥',
                 '90-99': '😱🏅⚡ DANGER ZONE ⚡🏅😱',
-                '100': '💯🏆😂 DE BIKE, CTZ 😂🏆💯'
+                '100': '💯🏆😂 DE BIKE, CTZ 😂🏆💯',
+                '100+': '🚀 EXTRATERRESTRE! 🚀'
             };
-            if (ultimoTaf === "L2") {
-                frasesHomem = {
-                    ...frasesHomem,
-                    '90-99': '📈🏅👟 ALÔ, L1?!! 👟🏅📈',
-                    '100': '💯😎 L1, TÔ NA ÁREA! 😎💯'
-                }
-            }
-            if (ultimoTaf === "L1") {
-                frasesHomem = {
-                    ...frasesHomem,
-                    '90-99': '📈👉🅱️ ZONA BRAVO 🅱️👈📈',
-                    '100': '💯👏 BRAVO? PARTIU!!! 👏💯'
-                }
-            }
-            if (ultimoTaf === "B2") {
-                frasesHomem = {
-                    ...frasesHomem,
-                    '90-99': '📈🏅👟 ALÔ, B1?!! 👟🏅📈',
-                    '100': '💯😎 B1, TÔ NA ÁREA! 😎💯'
-                }
-            }
-            if (ultimoTaf === "B1") {
-                frasesHomem = {
-                    ...frasesHomem,
-                    '90-99': '📈👉🅰️ ZONA ALFA 🅰️👈📈',
-                    '100': '💯😎 ALFA? PARTIU!!! 😎💯'
-                }
-            }
-            if (ultimoTaf === "A2") {
-                frasesHomem = {
-                    ...frasesHomem,
-                    '90-99': '📈🏅👟 ALÔ, A1?!! 👟🏅📈',
-                    '100': '💯🛴 A1, TÔ NA ÁREA! 🛴💯'
-                }
-            }
-            let frasesMulher = {
-                ...frasesHomem,
-                '70-79': '🏃‍♀️👏 SHOWD CADÊNCIA! 👏🏃‍♀️',
-                '80-89': '🔥🏃‍♀️👉 Q TREINO TOP! 👈🏃‍♀️🔥',
-            };
-            let frasesCardPrint = {
+
+            const frasesCardPrint = {
                 '60-69': '🎯 ZONA 2, PAGO!! 🎯',
                 '70-79': '👏 SHOWD CADÊNCIA! 👏',
                 '80-89': '🔥 Q TREINO TOP!! 🔥',
                 '90-99': '⚡ DANGER ZONE ⚡',
-                '100': '💯😂 DE BIKE, CTZ 😂💯'
-            }
-            if (ultimoTaf === "L2") {
-                frasesCardPrint = {
-                    ...frasesCardPrint,
-                    '90-99': '📈👟 ALÔ, L1?!! 👟📈',
-                    '100': '💯 L1, TÔ NA ÁREA! 💯'
-                }
-            }
-            if (ultimoTaf === "L1") {
-                frasesCardPrint = {
-                    ...frasesCardPrint,
-                    '90-99': '👉🅱️ ZONA BRAVO 🅱️👈',
-                    '100': '💯👏 BRAVO? PARTIU! 👏💯'
-                }
-            }
-            if (ultimoTaf === "B2") {
-                frasesCardPrint = {
-                    ...frasesCardPrint,
-                    '90-99': '📈👟 ALÔ, B1?!! 👟📈',
-                    '100': '💯 B1, TÔ NA ÁREA! 💯'
-                }
-            }
-            if (ultimoTaf === "B1") { //🔝
-                frasesCardPrint = {
-                    ...frasesCardPrint,
-                    '90-99': '👉🅰️ ZONA ALFA 🅰️👈',
-                    '100': '💯😎 ALFA? PARTIU! 😎💯'
-                }
-            }
-            if (ultimoTaf === "A2") {
-                frasesCardPrint = {
-                    ...frasesCardPrint,
-                    '90-99': '🏅👟 ALÔ, A1?!! 👟🏅',
-                    '100': '💯🛴 A1, TÔ NA ÁREA! 🛴💯'
-                }
+                '100': '💯😂 DE BIKE, CTZ 😂',
+                '100+': '🚀 EXTRATERRESTRE! 🚀'
             }
             const frasesHomemCardPrint = {
                 ...frasesHomem,
@@ -489,7 +1036,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // ultimoTaf is already defined in the parent scope
 
             let bgStart, bgEnd;
-            if (ultimoTaf === "A1" && notaInteiro === 100) {
+            if (notaInteiro >= 100) {
+                // Nota 100 ou maior: usar esquema dourado
                 bgStart = gold;
                 bgEnd = gold;
             }
@@ -509,73 +1057,58 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
             else {
-                if (ultimoTaf?.includes('A')) {
-                    if (ultimoTaf === "A1") {
-                        // >= 90: manter lógica atual de pretos e ouro
-                        if (notaInteiro < 95) {
-                            const t = (notaInteiro - 90) / 5; // 0..1 (90->95)
-                            bgStart = interpolarRgb(black90Start, black, t);
-                            bgEnd = interpolarRgb(black90End, black, t);
-                        } else if (notaInteiro < 100) {
-                            bgStart = black;
-                            bgEnd = black;
-                        }
-                    }
-                    else {
-                        bgStart = black90Start;
-                        bgEnd = black90End;
-                    }
-                }
-                else {
-                    if (ultimoTaf?.includes('L')) {
-                        bgStart = silverL90Start;
-                        bgEnd = silverL90End;
-                    }
-                    else {
-                        bgStart = silverB90Start;
-                        bgEnd = silverB90End;
-                    }
+                // >= 90: manter lógica atual de pretos e ouro
+                if (notaInteiro < 95) {
+                    const t = (notaInteiro - 90) / 5; // 0..1 (90->95)
+                    bgStart = interpolarRgb(black90Start, black, t);
+                    bgEnd = interpolarRgb(black90End, black, t);
+                } else if (notaInteiro < 100) {
+                    bgStart = black;
+                    bgEnd = black;
                 }
             }
 
             // cor do texto — fixa por sexo para < 90 (sem variação por luminância)
             let textColor;
-            if (ultimoTaf === "A1" && notaInteiro === 100) {
+            let atividadeTextColor;
+            let faixaTextColor;
+            
+            if (notaInteiro >= 100) {
+                // Nota 100 ou maior: usar esquema dourado
                 textColor = sexo === 'F' ? '#2c0045ff' : '#002157ff';
+                atividadeTextColor = sexo === 'F' ? '#2c0045ff' : '#002157ff';
+                faixaTextColor = sexo === 'F' ? '#2c0045ff' : '#002157ff';
             }
-            else if ((!ultimoTaf?.includes('A') && notaInteiro >= 90) || notaInteiro < 90) {
-                textColor = sexo === 'F' ? 'rgb(54, 0, 96)' : 'rgb(0, 37, 96)';
-            } else {
-                // 90–99: manter cores claras atuais por sexo
+            else if (notaInteiro >= 90) {
+                // 90–99: fundo preto, texto claro
                 textColor = sexo === 'F' ? 'rgb(230, 180, 204)' : 'rgb(156, 202, 221)';
+                atividadeTextColor = sexo === 'F' ? 'rgb(230, 180, 204)' : 'rgb(156, 202, 221)';
+                faixaTextColor = sexo === 'F' ? 'rgb(230, 180, 204)' : 'rgb(156, 202, 221)';
+            } else {
+                // < 90: cores normais
+                textColor = sexo === 'F' ? 'rgb(54, 0, 96)' : 'rgb(0, 37, 96)';
+                atividadeTextColor = sexo === 'F' ? 'rgb(54, 0, 96)' : 'rgb(0, 37, 96)';
+                faixaTextColor = sexo === 'F' ? 'rgb(54, 0, 96)' : 'rgb(0, 37, 96)';
             }
 
             const zone = rotuloZona(notaInteiro);
-            const phrase = frases[zone] || (notaInteiro >= 90 ? frases['90-100'] : '💪 BORA VIBRAR! 💪');
+            const phrase = frases[zone] || (notaInteiro >= 90 ? frases['100+'] : '💪 BORA VIBRAR! 💪');
             const printPhrase = (frasesPrint && frasesPrint[zone]) ? frasesPrint[zone] : phrase;
 
             // calcular tempo / pace para exibir no card
             let displayTempo = '--:--', displayPace = '--:--';
             try {
-                if (tipoEntrada === 'tempo') {
-                    const tempoVal = document.getElementById('tempo').value;
-                    const seg = tempoStringParaSegundos(tempoVal);
-                    displayTempo = segundosParaMMSS(seg);
-                    displayPace = segundosParaMMSS(seg / distancia);
-                } else {
-                    const paceVal = document.getElementById('pace').value;
-                    const paceSeg = tempoStringParaSegundos(paceVal);
-                    displayPace = segundosParaMMSS(paceSeg);
-                    const seg = paceSeg * distancia;
-                    displayTempo = segundosParaMMSS(seg);
-                }
+                const tempoVal = document.getElementById('tempo').value;
+                const seg = tempoStringParaSegundos(tempoVal);
+                displayTempo = segundosParaMMSS(seg);
+                displayPace = segundosParaMMSS(seg / distancia);
             } catch (e) { /* segura se inputs faltarem */ }
 
             const distLabel = Number.isFinite(distancia)
                 ? (parseFloat(distancia.toFixed(1)) % 1 === 0
-                    ? `${distancia.toFixed(0)} k <span class="tafimetro-separator">|</span> <span class="tafimetro-value">${ultimoTaf}</span>`
-                    : `${distancia.toFixed(1)} k <span class="tafimetro-separator">|</span> <span class="tafimetro-value">${ultimoTaf}</span>`)
-                : `-- k <span class="tafimetro-separator">|</span> <span class="tafimetro-value">${ultimoTaf}</span>`;
+                    ? `${(distancia * 1000).toFixed(0)} m`
+                    : `${(distancia * 1000).toFixed(0)} m`)
+                : `-- m`;
 
             const hoje = (() => {
                 const d = new Date();
@@ -599,7 +1132,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
             document.getElementById('cardDate').textContent = hoje;
             document.getElementById('scoreBig').textContent = notaInteiro;
-            document.getElementById('scoreDistancia').innerHTML = distLabel;
+            
+            // Aplicar cores dinâmicas baseadas na nota
+            const scoreAtividadeEl = document.getElementById('scoreAtividade');
+            const scoreAtividadeTextEl = document.getElementById('scoreAtividadeText');
+            const scoreFaixaEtariaEl = document.getElementById('scoreFaixaEtaria');
+            
+            if (scoreAtividadeEl) {
+                scoreAtividadeEl.style.color = atividadeTextColor;
+            }
+            if (scoreAtividadeTextEl) {
+                scoreAtividadeTextEl.style.color = atividadeTextColor;
+            }
+            if (scoreFaixaEtariaEl) {
+                scoreFaixaEtariaEl.style.color = faixaTextColor;
+            }
+            
+            document.getElementById('scoreAtividadeText').textContent = atividadeNome;
+            document.getElementById('scoreFaixaEtaria').textContent = "🔢 "+faixaEtariaNome;
             document.getElementById('zoneSmall').textContent = zone;
             document.getElementById('cardTempo').textContent = displayTempo;
             document.getElementById('cardPace').textContent = `${displayPace} /km`;
@@ -673,13 +1223,21 @@ function montarNomeArquivo() {
     return `tafimetro-${notaStr}-${distStr}_${dd}-${mm}-${yy}.png`;
 }
 
+// Adicionar listener para o seletor de atividade
+document.addEventListener('DOMContentLoaded', function () {
+    const atividadeSelect = document.getElementById('atividade');
+    if (atividadeSelect) {
+        // Atualizar emoji inicial
+        atualizarEmojiAtividade();
+    }
+});
+
 // Gera dados (array de {x: tempoSegundos, y: nota}) para uma distância e sexo
 function gerarDadosParaDistancia(notas, idade, sexo, km) {
     const dados = [];
-    const ultimoTaf = document.getElementById('ultimoTaf')?.value || 'A1';
     for (const nota of notas) {
         try {
-            const res = tempoEPaceParaNota(nota, idade, sexo, km, ultimoTaf);
+            const res = tempoEPaceParaNota(nota, idade, sexo, km, 'A1');
             let tempo;
             if (res && typeof res === 'object') tempo = res.tempo || res.time || res.t || res;
             else tempo = res;
@@ -822,9 +1380,7 @@ function codigoParaNomeNivel(codigo) {
 // Adicione esta função para atualizar o título
 function atualizarTituloGraficos() {
     const idade = inputIdade.value;
-    const nivel = document.getElementById('ultimoTaf').value;
-    const nomeNivel = codigoParaNomeNivel(nivel);
-    tituloGraficos.textContent = `Gráficos: Nota vs Tempo, ${nomeNivel}`;
+    tituloGraficos.textContent = `Gráficos: Nota vs Tempo, A1`;
 }
 
 function onFormInputsChange() {
@@ -833,6 +1389,14 @@ function onFormInputsChange() {
     atualizarTabelaNotas();
     try { gerarGraficos(); } catch (e) { }
 }
+
+// Adicionar listener para atividade
+document.addEventListener('DOMContentLoaded', function () {
+    const atividadeSelect = document.getElementById('atividade');
+    if (atividadeSelect) {
+        atividadeSelect.addEventListener('change', onFormInputsChange);
+    }
+});
 
 // Chamar gerarGraficos() após carregar página e quando idade mudar
 document.addEventListener('DOMContentLoaded', function () {
@@ -852,26 +1416,63 @@ onFormInputsChange();
 function atualizarTabelaNotas() {
     const idade = parseInt(document.getElementById('idade').value);
     const sexo = document.getElementById('sexo').value;
-    const distancia = obterDistanciaFormatada();
+    const atividade = document.getElementById('atividade').value;
     const tabelaNotas = document.getElementById('tabelaNotas');
     const idadeRef = document.getElementById('idade-ref');
+    const distanciaRef = document.getElementById('distancia-ref');
 
     // Atualiza a idade no título
     idadeRef.textContent = idade;
 
+    // Atualiza a distância no título
+    const distancias = {
+        'corrida2400': 2.4,
+        'corrida3200': 3.2,
+        'natacao50': 0.05,
+        'natacao100': 0.1,
+        'caminhada4800': 4.8
+    };
+    distanciaRef.textContent = distancias[atividade] || 2.4;
+
     // Limpa a tabela
     tabelaNotas.innerHTML = '';
 
-    // Gera linhas para notas de 100 a 50
-    const ultimoTaf = document.getElementById('ultimoTaf')?.value || 'A1';
+    // Gera linhas para notas de 100 a 50 usando o novo sistema
+    const faixaEtaria = obterFaixaEtaria(idade, atividade);
+    const tabela = tabelasPontuacao[atividade];
+
+    if (!tabela || !tabela[sexo] || !tabela[sexo][faixaEtaria]) {
+        tabelaNotas.innerHTML = '<tr><td colspan="3">Tabela não disponível para esta atividade/faixa etária</td></tr>';
+        return;
+    }
+
+    const pontosFaixa = tabela[sexo][faixaEtaria];
+    const pontos = Object.keys(pontosFaixa).map(Number).sort((a, b) => a - b);
+
     for (let nota = 50; nota <= 100; nota += 1) {
-        const resultado = tempoEPaceParaNota(nota, idade, sexo, distancia, ultimoTaf);
+        let tempo = '--:--';
+        let pace = '--:--';
+
+        // Encontrar tempo correspondente à nota
+        for (const ponto of pontos) {
+            if (Math.abs(ponto - nota) < 0.5) {
+                tempo = pontosFaixa[ponto];
+                // Calcular pace se for corrida/caminhada
+                const distancia = distancias[atividade] || 2.4;
+                if (distancia > 0.1) { // Não calcular pace para natação
+                    const tempoSegundos = tempoStringParaSegundos(tempo);
+                    const paceSegundos = tempoSegundos / distancia;
+                    pace = segundosParaMMSS(paceSegundos);
+                }
+                break;
+            }
+        }
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td>${nota}</td>
-            <td>${resultado.tempo}</td>
-            <td>${resultado.pace}</td>
+            <td>${tempo}</td>
+            <td>${pace}</td>
         `;
         tabelaNotas.appendChild(tr);
     }
@@ -884,19 +1485,27 @@ document.addEventListener('DOMContentLoaded', onFormInputsChange);
 function atualizarTituloReferencia() {
     const idade = document.getElementById('idade').value;
     const sexo = document.getElementById('sexo').value;
-    const distancia = document.getElementById('distancia').value;
-    const nivel = document.getElementById('ultimoTaf').value;
-    
+    const atividade = document.getElementById('atividade').value;
+
+    // Obter distância da atividade selecionada
+    const distancias = {
+        'corrida2400': 2.4,
+        'corrida3200': 3.2,
+        'natacao50': 0.05,
+        'natacao100': 0.1,
+        'caminhada4800': 4.8
+    };
+    const distancia = distancias[atividade] || 2.4;
+
     document.getElementById('idade-ref').textContent = idade;
     document.getElementById('distancia-ref').textContent = distancia;
-    const nomeNivel = codigoParaNomeNivel(nivel);
-    document.getElementById('nivel-ref').textContent = nomeNivel; // Show the full level name (ALFA 1, LIGHT 2, etc.)
     document.getElementById('sexo-ref').textContent = sexo === 'M' ? 'Masc.' : 'Fem.';
-    
+    document.getElementById('nivel-ref').textContent = 'A1';
+
     // Atualiza o título da tabela de referência
     const tituloReferencia = document.getElementById('titulo-referencia');
     if (tituloReferencia) {
-        tituloReferencia.textContent = `Tempos de Referência para Nota 100 (${nomeNivel})`;
+        tituloReferencia.textContent = `Tempos de Referência para Nota 100 (A1)`;
     }
 }
 
@@ -1816,31 +2425,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// Adicionar listener para o select de intervalo
-document.getElementById('intervalado')?.addEventListener('change', function () {
-    const scoreBig = document.getElementById('scoreBig');
-    const obsDiv = document.getElementById('obsIntervalado');
-
-    // if (scoreBig) {
-    //     scoreBig.style.display = this.value === 'sim' ? 'none' : 'block';
-    // }
-
-    if (obsDiv) {
-        obsDiv.style.display = this.value === 'sim' ? 'block' : 'none';
-    }
-
-});
-
 // Modificar o event listener do formulário para incluir a verificação de intervalo
 const originalSubmitHandler = document.getElementById('calcForm')?.onsubmit;
 document.getElementById('calcForm').onsubmit = function (e) {
-    // Verificar se é intervalo e esconder o scoreBig se necessário
-    const isIntervalado = document.getElementById('intervalado')?.value === 'sim';
+    // Sempre considerar como não intervalado
     const scoreBig = document.getElementById('scoreBig');
-    if (scoreBig && isIntervalado) {
-        scoreBig.style.display = 'none';
+    if (scoreBig) {
+        scoreBig.style.display = 'block';
     }
-    else scoreBig.style.display = 'block';
 
     // Chamar o handler original se existir
     if (originalSubmitHandler) {

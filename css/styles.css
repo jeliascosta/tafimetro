@@ -367,6 +367,7 @@ tr:hover {
     font-family: 'Helvetica Neue', Arial, sans-serif;
     text-align: center;
     position: relative;
+    min-width: 172px;
     /* para posicionar cantos absolutos */
 }
 
@@ -546,12 +547,6 @@ input:checked+.slider:before {
     align-items: center;
     justify-content: center;
     flex-wrap: nowrap;
-}
-
-/* cada item meta */
-.share-card .card-meta .meta-item {
-    text-align: center;
-    min-width: 78px;
 }
 
 .distancia-container {

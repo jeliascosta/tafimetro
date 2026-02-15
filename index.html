@@ -28,48 +28,31 @@
 
 <body>
     <div class="container">
-        <h1 style="margin-top: 5px;">⚓📊 TAFímetro 🏃🏻‍♀️🏊</h1>
+        <h1 style="margin-top: 5px;">⚓📊 TAFímetro <span id="tituloEmojis">🏃🏻‍♀️🏊</span></h1>
         <p class="instrucao-frase">📈 Insira os dados do seu TAF/treino e desbrave seu card!</p>
         <form id="calcForm">
-            <div class="input-group">
-                <!-- <label>Tipo de entrada:</label> -->
-                <div class="radio-group">
-                    <input type="radio" id="tipoTempo" name="tipoEntrada" value="tempo" checked>
-                    <label for="tipoTempo" style="margin-left: -10px;">🕒 Tempo total</label>
-                    <input type="radio" id="tipoPace" name="tipoEntrada" value="pace">
-                    <label for="tipoPace" style="margin-left: -10px;">⏱️ Pace (min/km)</label>
+            <div style="display: flex; gap: 8px; align-items: flex-end;">
+                <div style="flex: 1;">
+                    <label for="atividade">🏃 Atividade:</label>
+                    <select id="atividade" required style="width: 100%; height: 38px;">
+                        <option value="corrida2400">Corrida 2.4km</option>
+                        <option value="corrida3200">Corrida 3.2km</option>
+                        <option value="natacao50">Natação 50m</option>
+                        <option value="natacao100">Natação 100m</option>
+                        <option value="caminhada4800">Caminhada 4.8km</option>
+                    </select>
                 </div>
             </div>
 
             <div id="tempoInput">
-                <label for="tempo">🕒 (mm:ss ou hh:mm:ss):</label>
+                <label for="tempo">🕒 Tempo (mm:ss):</label>
                 <input type="text" id="tempo" value="30:38">
-            </div>
-
-            <div id="paceInput" style="display: none;">
-                <label for="pace">⏱️ (mm:ss):</label>
-                <input type="text" id="pace" value="04:59">
             </div>
 
             <div style="display: flex; gap: 8px; align-items: flex-end;">
                 <div style="flex: 1;">
                     <label for="idade" style="margin-bottom: 4px; display: block;">🔢 Idade:</label>
-                    <input type="number" id="idade" value="35" required style="width: 77%;">
-                </div>
-                <div style="width: 260px;">
-                    <label for="ultimoTaf"
-                        style="margin-bottom: 4px; display: block; text-align: center;font-size:0.8em">📶
-                        Hoje me considero um(a) corredor(a):</label>
-                    <select id="ultimoTaf"
-                        style="width: 100%; height: 38px; border-radius: 4px; border: 1px solid #ced4da; padding: 0 8px;">
-                        <option value="A1">ALFA 1 | Na caça do ritmo forte!</option>
-                        <option value="A2">ALFA 2 | Com um ritmo maneiro, às vezes curto um ritmo mais forte</option>
-                        <option value="B1">BRAVO 1 | Capaz de manter um ritmo maneiro (nem tão forte, nem tão
-                            light)</option>
-                        <option value="B2">BRAVO 2 | Geralmente light, curto aumentar o ritmo às vezes</option>
-                        <option value="L1" selected>LIGHT 1 | Habitual, sendo light tá safo ;)</option>
-                        <option value="L2">LIGHT 2 | Ocasional, ganhando o hábito!</option>
-                    </select>
+                    <input type="number" id="idade" value="35" min="18" required style="width: 100%;">
                 </div>
             </div>
 
@@ -81,40 +64,7 @@
                         <option value="F" selected>Feminino</option>
                     </select>
                 </div>
-                <div style="width: 115px;">
-                    <label for="esteira"
-                        style="font-size: 0.8em; margin-bottom: 4px; display: block;text-align: center;">🏠︎ Foi na
-                        esteira?</label>
-                    <select id="esteira"
-                        style="width: 100%; height: 38px; border-radius: 4px; border: 1px solid #ced4da; padding: 0 8px;">
-                        <option value="nao" selected>Não</option>
-                        <option value="sim">Sim</option>
-                    </select>
-                </div>
             </div>
-
-            <div style="display: flex; gap: 8px; align-items: flex-end;">
-                <div style="flex: 1;">
-                    <label for="distancia" style="margin-bottom: 4px; display: block;">🛣️ Distância (km):</label>
-                    <input type="number" id="distancia" step="0.01" value="5" required style="width: 88%">
-                </div>
-                <div style="width: 180px;">
-                    <label for="intervalado"
-                        style="font-size: 0.8em; margin-bottom: 4px; display: block;text-align: center;">⏸️
-                        Teve alguma pausa total?</label>
-                    <select id="intervalado"
-                        style="width: 100%; height: 38px; border-radius: 4px; border: 1px solid #ced4da; padding: 0 8px;">
-                        <option value="nao">Não</option>
-                        <option value="sim">Sim</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="obsIntervalado"
-                style="display:none; margin: 0px 0px 15px 0px;text-align: justify;font-size: 0.8rem;">OBS: O TAFímetro
-                (ainda) não possui um critério técnico para atribuir nota a treinos com pausa total/passiva. Caso possua
-                uma
-                sugestão de como ajustar a equivalência, entre em contato com o desenvolvedor!</div>
 
             <!-- <button type="submit">⚡Desbrava !</button> -->
             <button type="submit"
@@ -131,13 +81,12 @@
                             <div class="card-date" id="cardDate"
                                 style="font-size:.7rem;font-weight:lighter;opacity:.8;margin: 0px 0px 5px -2px">
                             </div>
-                            <span class="card-decoration" style="right: calc(50% - 61px);">🏃🏻‍♀️</span>
+                        <span class="card-decoration" style="right: calc(50% - 61px);">⚓</span>
                         </div>
                     </div>
                     <div class="score-big" id="scoreBig"></div>
-                    <div id="scoreDistancia"
-                        style="display: inline-flex; justify-content: center; white-space: nowrap; font-family: 'Inter', sans-serif; font-size: 2.7rem; font-weight: 800; text-align: center; width: 100%; letter-spacing: -0.04em;padding-right: 20px;margin: -3px">
-                    </div>
+                    <div id="scoreAtividade" style="display: flex; align-items: center; justify-content: center; font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 800; text-align: center; width: 100%; color: #666; margin: 0px 0 10px 0; padding: 0px 10px 0px 0px"><span id="cardEmojiDireita" style="margin-right: 2px;"></span><span id="scoreAtividadeText"></span></div>
+                    <div id="scoreFaixaEtaria" style="display: flex; justify-content: center; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; text-align: center; width: 100%; color: #888; margin: 3px 0 15px 0;"></div>
                     <div class="zone-small" id="zoneSmall"></div>
                     <div class="card-meta"
                         style="display:flex;gap:12px;margin-top:8px;align-items:center;justify-content:center;">
@@ -160,6 +109,13 @@
                     <span style="margin-right: 10px; font-weight: bold;">Mostrar Pace:</span>
                     <label class="switch" title="Mostrar/ocultar pace">
                         <input type="checkbox" id="togglePace" checked>
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div style="display: flex; align-items: center;">
+                    <span style="margin-right: 10px; font-weight: bold;">Mostrar Faixa:</span>
+                    <label class="switch" title="Mostrar/ocultar faixa etária">
+                        <input type="checkbox" id="toggleFaixa" checked>
                         <span class="slider round"></span>
                     </label>
                 </div>
