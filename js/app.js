@@ -404,7 +404,7 @@ const tabelasPontuacao = {
                 '90': '44:00',
                 '100': '42:00'
             },
-            '49a49': {
+            '46a49': {
                 '50': '56:00',
                 '60': '53:00',
                 '70': '50:00',
@@ -1135,11 +1135,11 @@ document.addEventListener('DOMContentLoaded', function () {
             
             // Obter nome da atividade para exibição
             const nomesAtividade = {
-                'corrida2400': 'Corrida 2.4km',
-                'corrida3200': 'Corrida 3.2km',
-                'natacao50': 'Natação 50m',
-                'natacao100': 'Natação 100m',
-                'caminhada4800': 'Caminhada 4.8km'
+                'corrida2400': 'Corrida | 2.4km',
+                'corrida3200': 'Corrida | 3.2km',
+                'natacao50': 'Natação | 50m',
+                'natacao100': 'Natação | 100m',
+                'caminhada4800': 'Caminhada | 4.8km'
             };
             const atividadeNome = nomesAtividade[atividade] || 'Atividade';
 
