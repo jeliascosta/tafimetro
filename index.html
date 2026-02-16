@@ -81,18 +81,23 @@
                             <div class="card-date" id="cardDate"
                                 style="font-size:.7rem;font-weight:lighter;opacity:.8;margin: 0px 0px 5px -2px">
                             </div>
-                        <span class="card-decoration" style="right: calc(50% - 61px);">⚓</span>
+                            <span class="card-decoration" style="right: calc(50% - 61px);">⚓</span>
                         </div>
                     </div>
-                    <div id="scoreAtividade" style="display: flex; align-items: center; justify-content: center; /*font-family: 'Inter', sans-serif; */font-size: 1rem; font-weight: 700; text-align: center; color: #666; padding: 3px 20px; margin: 7px -10px 0px -10px; background-color: rgba(255, 255, 255, 0.10); width: calc(100% + 20px); box-sizing: border-box; position: relative;"><span id="cardEmojiDireita" style="margin-right: 2px;"></span><span id="scoreAtividadeText"></span></div>
+                    <div id="scoreAtividade"
+                        style="display: flex; align-items: center; justify-content: center; /*font-family: 'Inter', sans-serif; */font-size: 1rem; font-weight: 700; text-align: center; color: #666; padding: 3px 20px; margin: 7px -10px 0px -10px; background-color: rgba(255, 255, 255, 0.10); width: calc(100% + 20px); box-sizing: border-box; position: relative;">
+                        <span id="cardEmojiDireita" style="margin-right: 2px;"></span><span
+                            id="scoreAtividadeText"></span></div>
                     <div class="score-big" id="scoreBig"></div>
-                    <div id="scoreFaixaEtaria" style="display: flex; justify-content: center; /*font-family: 'Inter', sans-serif; */font-size: 0.8rem; font-weight: 600; text-align: center; color: #888; padding: 0px 10px;margin: 0px 0px 12px 0px;"></div>
+                    <div id="scoreFaixaEtaria"
+                        style="display: flex; justify-content: center; /*font-family: 'Inter', sans-serif; */font-size: 0.8rem; font-weight: 600; text-align: center; color: #888; padding: 0px 10px;margin: 0px 0px 12px 0px;">
+                    </div>
                     <div class="zone-small" id="zoneSmall"></div>
                     <div class="card-meta"
                         style="display:flex;gap:12px;align-items:center;justify-content:center;padding: 0px 12px 0px 10px;margin-top: 2px">
                         <div class="meta-item">
-                            <div style="font-size:.75rem;font-weight:800;opacity:1">🕒 Tempo</div>
-                            <div style="font-size:.95rem;font-weight:800" id="cardTempo"></div>
+                            <div style="font-size:.75rem;font-weight:600;opacity:1">🕒 Tempo</div>
+                            <div style="font-size:.95rem;font-weight:600" id="cardTempo"></div>
                         </div>
                         <div class="meta-item">
                             <div style="font-size:.75rem;font-weight:600;opacity:1">➡️ Pace</div>
@@ -104,7 +109,8 @@
                 </div>
             </div>
 
-            <div id="opcoesCard" style="display: none; justify-content: center; align-items: center; margin: 10px 0; gap: 20px;">
+            <div id="opcoesCard"
+                style="display: none; justify-content: center; align-items: center; margin: 10px 0; gap: 20px;">
                 <div style="display: flex; align-items: center;">
                     <span style="margin-right: 10px; font-weight: bold;">Mostrar Pace:</span>
                     <label class="switch" title="Mostrar/ocultar pace">
@@ -131,7 +137,9 @@
         </div>
 
         <div id="compositor" style="margin-top: 45px; display: none;">
-            <h3 style="font-size: clamp(1rem, 4vw, 1.5rem); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Combine com o print do seu app de esportes:</h3>
+            <h3
+                style="font-size: clamp(1rem, 4vw, 1.5rem); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                Combine com o print do seu app de esportes:</h3>
             <div class="compose-controls">
                 <input type="file" id="composeInput" accept="image/*" class="compose-upload">
                 <label id="composeScaleRow" for="composeScale"
@@ -244,9 +252,6 @@
                 </table>
             </div>
         </div>
-
-
-
     </div>
 
     <script src="js/calc.js"></script>
@@ -254,13 +259,12 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <footer>
-        <sub>TAFímetro | jonathan.elias@marinha.mil.br</sub>
+        <sub>TAFímetro v1.0| jonathan.elias@marinha.mil.br</sub>
+        <sub>Publicação base: CGCFN 108 REV1 (2021)</sub>
     </footer>
+
     <!-- Biblioteca para capturar o div como imagem -->
     <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
-
-
     <script src="js/app.js"></script>
 </body>
 
