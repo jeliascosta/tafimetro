@@ -649,15 +649,21 @@ function calcularNotaPorTabela(tempo, idade, sexo, atividade) {
     const pontosFaixa = tabela[sexoTabela][faixaEtaria];
     const tempoSegundos = tempoStringParaSegundos(tempo);
 
+    // Verificar se deve calcular notas > 100
+    const calcularMaior100 = document.getElementById('calcularMaior100')?.value === 'sim';
+
     // Encontrar os pontos mais próximos para interpolação
     const pontos = Object.keys(pontosFaixa).map(Number).sort((a, b) => a - b);
 
     if (pontos.length === 0) return 0;
 
-    // Verificar se o tempo é muito lento (maior que o tempo para 50 pontos)
-    const tempo50pontos = tempoStringParaSegundos(pontosFaixa[50]);
-    if (tempoSegundos > tempo50pontos) {
-        return 0;
+    // Se calcularMaior100 estiver ativo, não limitar a 100
+    if (!calcularMaior100) {
+        // Verificar se o tempo é muito lento (maior que o tempo para 50 pontos)
+        const tempo50pontos = tempoStringParaSegundos(pontosFaixa[50]);
+        if (tempoSegundos > tempo50pontos) {
+            return 0;
+        }
     }
 
     // Se o tempo for exatamente um dos tempos da tabela
@@ -677,6 +683,9 @@ function interpolarPontos(tempoSegundos, pontos, temposPorPonto) {
         return pontos[0];
     }
 
+    // Verificar se deve calcular notas > 100
+    const calcularMaior100 = document.getElementById('calcularMaior100')?.value === 'sim';
+
     // Encontrar os pontos que envolvem o tempo
     let pontoInferior = null;
     let pontoSuperior = null;
@@ -694,56 +703,45 @@ function interpolarPontos(tempoSegundos, pontos, temposPorPonto) {
         }
     }
 
-    if (!pontoInferior || !pontoSuperior) {
-        // Se estiver fora dos limites
-        // Para corrida: tempos menores = notas maiores
-        if (tempoSegundos <= tempoStringParaSegundos(temposPorPonto[pontos[0]])) {
-            // Melhor que todos os tempos - extrapolar usando taxa 90-100
-            let ponto90 = null;
-            let ponto100 = null;
-            
-            for (let i = 0; i < pontos.length - 1; i++) {
-                if (pontos[i] === 90 && pontos[i + 1] === 100) {
-                    ponto90 = pontos[i];
-                    ponto100 = pontos[i + 1];
-                    break;
-                }
-            }
-            
-            if (ponto90 && ponto100) {
-                const tempo90 = tempoStringParaSegundos(temposPorPonto[ponto90]);
-                const tempo100 = tempoStringParaSegundos(temposPorPonto[ponto100]);
-                
-                // Taxa de crescimento: 10 pontos por (tempo90 - tempo100) segundos
-                const taxaPorSegundo = 10 / (tempo90 - tempo100);
-                
-                // Calcular quanto tempo o usuário foi melhor que o tempo de 100 pontos
-                const diferencaTempo = tempo100 - tempoSegundos;
-                
-                // Nota extrapolada: 100 + (diferencaTempo * taxaPorSegundo)
-                const notaExtrapolada = 100 + (diferencaTempo * taxaPorSegundo);
-                
-                return Math.round(notaExtrapolada * 100) / 100;
-            }
-            
-            return pontos[0]; // Fallback
-        }
+    // Se calcularMaior100 estiver ativo e o tempo for melhor que nota 100
+    if (calcularMaior100 && tempoSegundos < tempoStringParaSegundos(temposPorPonto[100])) {
+        // Extrapolation: continuar a tendência além de 100
+        const tempo100 = tempoStringParaSegundos(temposPorPonto[100]);
+        const tempo90 = tempoStringParaSegundos(temposPorPonto[90]);
         
-        // Pior que todos os tempos
-        return pontos[pontos.length - 1];
+        if (pontos.length >= 2 && pontos[pontos.length - 1] === 100) {
+            // Calcular taxa de melhora entre 90 e 100
+            const taxaMelhora = (tempo90 - tempo100) / 10; // segundos por ponto acima de 90
+            const pontosAcima100 = Math.floor((tempo90 - tempoSegundos) / taxaMelhora);
+            return 100 + pontosAcima100;
+        }
     }
 
-    // Interpolação linear para corrida (tempos menores = notas maiores)
+    if (!pontoInferior || !pontoSuperior) {
+        // Se estiver fora dos limites, retornar o ponto mais próximo
+        if (calcularMaior100) {
+            // Com calcularMaior100, permite extrapolation
+            if (tempoSegundos < tempoStringParaSegundos(temposPorPonto[100])) {
+                // Tempo melhor que 100 - extrapolation
+                const tempo100 = tempoStringParaSegundos(temposPorPonto[100]);
+                const tempo90 = tempoStringParaSegundos(temposPorPonto[90]);
+                const taxaMelhora = (tempo90 - tempo100) / 10;
+                const pontosAcima100 = Math.floor((tempo90 - tempoSegundos) / taxaMelhora);
+                return 100 + pontosAcima100;
+            }
+        }
+        
+        const ultimoPonto = pontos[pontos.length - 1];
+        const tempoUltimo = tempoStringParaSegundos(temposPorPonto[ultimoPonto]);
+        return tempoSegundos <= tempoUltimo ? ultimoPonto : 0;
+    }
+
+    // Interpolação linear normal
     const tempoInferior = tempoStringParaSegundos(temposPorPonto[pontoInferior]);
     const tempoSuperior = tempoStringParaSegundos(temposPorPonto[pontoSuperior]);
-    const pontoInferiorNum = pontoInferior;
-    const pontoSuperiorNum = pontoSuperior;
-
-    // Para corrida: proporção invertida
-    const proporcao = (tempoInferior - tempoSegundos) / (tempoInferior - tempoSuperior);
-    const notaInterpolada = pontoInferiorNum + proporcao * (pontoSuperiorNum - pontoInferiorNum);
-
-    return Math.round(notaInterpolada * 100) / 100; // Arredondar para 2 casas decimais
+    
+    const proporcao = (tempoSegundos - tempoInferior) / (tempoSuperior - tempoInferior);
+    return pontoInferior + proporcao * (pontoSuperior - pontoInferior);
 }
 
 // Função para atualizar emojis e texto baseado no sexo selecionado
@@ -794,7 +792,7 @@ function atualizarEmojiAtividade() {
     };
 
     const emoji = emojis[atividade] || '🏃';
-    labelAtividade.innerHTML = `${emoji} Atividade:`;
+    labelAtividade.innerHTML = `${emoji} Teste:`;
 }
 
 // Preenche tabela de referência com faixas etárias intercaladas por sexo
@@ -941,20 +939,36 @@ function obterDistanciaFormatada() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const tEl = document.getElementById('tempo');
+    const tEl = document.getElementById('tempoMinutos');
     const iEl = document.getElementById('idade');
-    const sEl = document.getElementById('sexo');
+    const sexoEl = document.getElementById('sexo');
     const aEl = document.getElementById('atividade');
+
+    // Definir valores iniciais dos seletores de tempo
+    const tempoInicial = '30:38'; // Valor padrão
+    const [minutos, segundos] = tempoInicial.split(':');
+    if (tEl) tEl.value = minutos;
+    const sEl = document.getElementById('tempoSegundos');
+    if (sEl) sEl.value = segundos;
     const vT = localStorage.getItem('tafimetro_tempo');
     const vI = localStorage.getItem('tafimetro_idade');
     const vS = localStorage.getItem('tafimetro_sexo');
     const vA = localStorage.getItem('tafimetro_atividade');
-    if (tEl && vT != null) tEl.value = vT;
+    if (tEl && vT != null) {
+        const [minutos, segundos] = vT.split(':');
+        tEl.value = minutos;
+        if (sEl) sEl.value = segundos;
+    }
     if (iEl && vI != null) iEl.value = vI;
-    if (sEl && vS != null) sEl.value = vS;
+    if (sexoEl && vS != null) sexoEl.value = vS;
     if (aEl && vA != null) aEl.value = vA;
-    if (tEl) tEl.addEventListener('input', () => localStorage.setItem('tafimetro_tempo', tEl.value || ''));
+    if (tEl) tEl.addEventListener('input', () => {
+        const minutos = tEl.value;
+        const segundos = sEl.value;
+        localStorage.setItem('tafimetro_tempo', `${minutos}:${segundos}`);
+    });
     if (iEl) iEl.addEventListener('change', () => localStorage.setItem('tafimetro_idade', iEl.value || ''));
+    if (sexoEl) sexoEl.addEventListener('change', () => localStorage.setItem('tafimetro_sexo', sexoEl.value || ''));
     if (aEl) aEl.addEventListener('change', () => {
         localStorage.setItem('tafimetro_atividade', aEl.value || '');
         atualizarEmojiAtividade();
@@ -994,18 +1008,65 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 
-    // Handler para copiar/baixar somente o card (movido do index.html)
+    // Função unificada para gerar card com tratamento de estilos
+async function gerarCardParaExportacao() {
+    const card = document.getElementById('shareCard');
+    if (!card || card.style.display === 'none') {
+        throw new Error('Nenhum card gerado ainda!');
+    }
+
+    // Salvar os estilos originais
+    const originalBorderRadius = card.style.borderRadius;
+    const originalBoxShadow = card.style.boxShadow;
+
+    // Remover estilos temporariamente
+    card.style.borderRadius = '0';
+    card.style.boxShadow = 'none';
+
+    try {
+        const canvas = await html2canvas(card, {
+            scale: 3,
+            backgroundColor: null,
+            useCORS: true,
+            logging: false
+        });
+
+        // Restaurar os estilos originais
+        card.style.borderRadius = originalBorderRadius;
+        card.style.boxShadow = originalBoxShadow;
+
+        // Cortar 2px de cada lado (total 6px considerando scale 3)
+        const ctx = canvas.getContext('2d');
+        const pixelsParaCortar = 6; // 2px × 3 (scale) = 6px
+        const pixelsLaterais = 6; // 2px × 3 (scale) = 6px de cada lado
+        
+        // Cortar laterais e inferior
+        const imageData = ctx.getImageData(
+            pixelsLaterais, 
+            0, 
+            canvas.width - (pixelsLaterais * 2), 
+            canvas.height - pixelsParaCortar
+        );
+        const croppedCanvas = document.createElement('canvas');
+        croppedCanvas.width = canvas.width - (pixelsLaterais * 2);
+        croppedCanvas.height = canvas.height - pixelsParaCortar;
+        croppedCanvas.getContext('2d').putImageData(imageData, 0, 0);
+
+        return croppedCanvas;
+    } catch (error) {
+        // Restaurar estilos em caso de erro
+        card.style.borderRadius = originalBorderRadius;
+        card.style.boxShadow = originalBoxShadow;
+        throw error;
+    }
+}
+
+// Handler para copiar/baixar somente o card (movido do index.html)
     const btnShareCard = document.getElementById('copyCardBtn');
     if (!btnShareCard) return;
     btnShareCard.addEventListener('click', async () => {
-        const card = document.getElementById('shareCard');
-        if (!card || card.style.display === 'none') {
-            alert('Nenhum card gerado ainda!');
-            return;
-        }
         try {
-            const CARD_EXPORT_SCALE = 3;
-            const canvas = await html2canvas(card, { backgroundColor: null, scale: CARD_EXPORT_SCALE, useCORS: true });
+            const canvas = await gerarCardParaExportacao();
             const filename = montarNomeArquivo();
             const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1));
 
@@ -1033,56 +1094,18 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         } catch (e) {
             console.error('Falha ao exportar card:', e);
-            alert('Não foi possível gerar a imagem.');
+            alert(e.message || 'Não foi possível gerar a imagem.');
         }
     });
 
     const btnDownloadCard = document.getElementById('downloadCardBtn');
     if (btnDownloadCard) {
         btnDownloadCard.addEventListener('click', async () => {
-            const card = document.getElementById('shareCard');
-            if (!card || card.style.display === 'none') {
-                alert('Nenhum card gerado ainda!');
-                return;
-            }
-
             try {
-                // Salvar os estilos originais
-                const card = document.getElementById('shareCard');
-                const originalBorderRadius = card.style.borderRadius;
-
-                // Remover border-radius temporariamente
-                card.style.borderRadius = '0';
-
-                const canvas = await html2canvas(card, {
-                    scale: 3,
-                    backgroundColor: null,
-                    useCORS: true,
-                    logging: false
-                });
-
-                // Restaurar o border-radius original
-                card.style.borderRadius = originalBorderRadius;
-
-                // Cortar 2px de cada lado (total 6px considerando scale 3)
-                const ctx = canvas.getContext('2d');
-                const pixelsParaCortar = 6; // 2px × 3 (scale) = 6px
-                const pixelsLaterais = 6; // 2px × 3 (scale) = 6px de cada lado
-                
-                // Cortar laterais e inferior
-                const imageData = ctx.getImageData(
-                    pixelsLaterais, 
-                    0, 
-                    canvas.width - (pixelsLaterais * 2), 
-                    canvas.height - pixelsParaCortar
-                );
-                const croppedCanvas = document.createElement('canvas');
-                croppedCanvas.width = canvas.width - (pixelsLaterais * 2);
-                croppedCanvas.height = canvas.height - pixelsParaCortar;
-                croppedCanvas.getContext('2d').putImageData(imageData, 0, 0);
+                const canvas = await gerarCardParaExportacao();
 
                 // Criar link de download
-                const dataUrl = croppedCanvas.toDataURL('image/png');
+                const dataUrl = canvas.toDataURL('image/png');
                 const link = document.createElement('a');
                 link.download = `tafimetro-card-${new Date().toISOString().split('T')[0]}.png`;
                 link.href = dataUrl;
@@ -1094,7 +1117,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             } catch (err) {
                 console.error('Erro ao baixar o card:', err);
-                alert('Não foi possível baixar o card. Tente novamente.');
+                alert(err.message || 'Não foi possível baixar o card. Tente novamente.');
             }
         });
     }
@@ -1130,7 +1153,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
             let nota;
-            const tempo = document.getElementById('tempo').value;
+            const minutos = document.getElementById('tempoMinutos').value;
+            const segundos = document.getElementById('tempoSegundos').value;
+            const tempo = `${minutos}:${segundos}`;
             const atividade = document.getElementById('atividade').value;
             
             // Obter nome da atividade para exibição
@@ -1314,7 +1339,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // calcular tempo / pace para exibir no card
             let displayTempo = '--:--', displayPace = '--:--';
             try {
-                const tempoVal = document.getElementById('tempo').value;
+                const minutos = document.getElementById('tempoMinutos').value;
+                const segundos = document.getElementById('tempoSegundos').value;
+                const tempoVal = `${minutos}:${segundos}`;
                 const seg = tempoStringParaSegundos(tempoVal);
                 displayTempo = segundosParaMMSS(seg);
                 
