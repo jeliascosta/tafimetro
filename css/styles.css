@@ -213,8 +213,12 @@ th {
     color: white;
 }
 
-tr:hover {
+tr {
     background-color: #f5f5f5;
+}
+
+tr:hover {
+    background-color: #ffffff;
 }
 
 @media (max-width: 600px) {
@@ -367,7 +371,7 @@ tr:hover {
     font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     text-align: center;
     position: relative;
-    /* min-width: 172px; */
+    min-width: 180px; 
     /* para posicionar cantos absolutos */
 }
 

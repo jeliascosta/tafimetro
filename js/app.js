@@ -518,6 +518,23 @@ function preencherTabelaNotas(atividade, idade, sexo) {
         return;
     }
 
+    // Atualizar cabeçalho da tabela baseado na atividade
+    const thead = document.querySelector('.tabela-notas thead tr');
+    if (thead) {
+        if (atividade === 'natacao50' || atividade === 'natacao100') {
+            thead.innerHTML = `
+                <th>Nota</th>
+                <th>Tempo</th>
+            `;
+        } else {
+            thead.innerHTML = `
+                <th>Nota</th>
+                <th>Tempo</th>
+                <th>Pace</th>
+            `;
+        }
+    }
+
     const pontosFaixa = tabela[sexoTabela][faixaEtaria];
     const tbody = document.getElementById('tabelaNotas');
     if (!tbody) return;
@@ -589,11 +606,20 @@ function preencherTabelaNotas(atividade, idade, sexo) {
         }
 
         const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${nota}</td>
-            <td>${tempo}</td>
-            <td>${pace}</td>
-        `;
+        
+        // Verificar se é natação para remover coluna pace
+        if (atividade === 'natacao50' || atividade === 'natacao100') {
+            tr.innerHTML = `
+                <td>${nota}</td>
+                <td>${tempo}</td>
+            `;
+        } else {
+            tr.innerHTML = `
+                <td>${nota}</td>
+                <td>${tempo}</td>
+                <td>${pace}</td>
+            `;
+        }
         tbody.appendChild(tr);
     }
 }
@@ -940,20 +966,26 @@ function obterDistanciaFormatada() {
 
 document.addEventListener('DOMContentLoaded', function () {
     const tEl = document.getElementById('tempoMinutos');
+    const sEl = document.getElementById('tempoSegundos');
     const iEl = document.getElementById('idade');
     const sexoEl = document.getElementById('sexo');
     const aEl = document.getElementById('atividade');
 
     // Definir valores iniciais dos seletores de tempo
     const tempoInicial = '30:38'; // Valor padrão
-    const [minutos, segundos] = tempoInicial.split(':');
-    if (tEl) tEl.value = minutos;
-    const sEl = document.getElementById('tempoSegundos');
-    if (sEl) sEl.value = segundos;
+    const [minutosPadrao, segundosPadrao] = tempoInicial.split(':');
+    
+    // Definir valores padrão primeiro
+    if (tEl) tEl.value = minutosPadrao;
+    if (sEl) sEl.value = segundosPadrao;
+    
+    // Recuperar valores salvos do localStorage
     const vT = localStorage.getItem('tafimetro_tempo');
     const vI = localStorage.getItem('tafimetro_idade');
     const vS = localStorage.getItem('tafimetro_sexo');
     const vA = localStorage.getItem('tafimetro_atividade');
+    
+    // Aplicar valores salvos (se existirem)
     if (tEl && vT != null) {
         const [minutos, segundos] = vT.split(':');
         tEl.value = minutos;
@@ -962,25 +994,38 @@ document.addEventListener('DOMContentLoaded', function () {
     if (iEl && vI != null) iEl.value = vI;
     if (sexoEl && vS != null) sexoEl.value = vS;
     if (aEl && vA != null) aEl.value = vA;
+    
+    // Adicionar event listeners para salvar mudanças
     if (tEl) tEl.addEventListener('input', () => {
         const minutos = tEl.value;
+        const segundos = sEl ? sEl.value : '00';
+        localStorage.setItem('tafimetro_tempo', `${minutos}:${segundos}`);
+    });
+    
+    if (sEl) sEl.addEventListener('input', () => {
+        const minutos = tEl ? tEl.value : '30';
         const segundos = sEl.value;
         localStorage.setItem('tafimetro_tempo', `${minutos}:${segundos}`);
     });
+    
     if (iEl) iEl.addEventListener('change', () => localStorage.setItem('tafimetro_idade', iEl.value || ''));
     if (sexoEl) sexoEl.addEventListener('change', () => localStorage.setItem('tafimetro_sexo', sexoEl.value || ''));
     if (aEl) aEl.addEventListener('change', () => {
         localStorage.setItem('tafimetro_atividade', aEl.value || '');
         atualizarEmojiAtividade();
     });
-    if (sEl) {
-        sEl.addEventListener('change', () => {
-            localStorage.setItem('tafimetro_sexo', sEl.value || '');
-            atualizarEmojisPorSexo(sEl.value);
+    
+    // Atualizar emojis na inicialização
+    if (sexoEl) {
+        sexoEl.addEventListener('change', () => {
+            localStorage.setItem('tafimetro_sexo', sexoEl.value || '');
+            atualizarEmojisPorSexo(sexoEl.value);
         });
-        // Atualizar emojis na inicialização também
-        atualizarEmojisPorSexo(sEl.value);
+        atualizarEmojisPorSexo(sexoEl.value);
     }
+    
+    // Atualizar emoji da atividade na inicialização
+    atualizarEmojiAtividade();
 
     // Handler para toggle da faixa etária
     const toggleFaixa = document.getElementById('toggleFaixa');
