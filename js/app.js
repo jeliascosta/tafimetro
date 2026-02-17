@@ -1069,17 +1069,19 @@ async function gerarCardParaExportacao() {
             const canvas = await gerarCardParaExportacao();
             const filename = montarNomeArquivo();
             const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png', 1));
+            // const text = 'Meu card do TAFímetro';
+            const text = '';
 
             if (blob) {
                 const file = new File([blob], filename, { type: 'image/png' });
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], title: 'TAFímetro', text: 'Meu card do TAFímetro' });
+                    await navigator.share({ files: [file], title: 'TAFímetro', text });
                     return;
                 }
             }
             if (navigator.share) {
                 const dataUrl = canvas.toDataURL('image/png', 1);
-                await navigator.share({ title: 'TAFímetro', text: 'Meu card do TAFímetro', url: dataUrl });
+                await navigator.share({ title: 'TAFímetro', text, url: dataUrl });
 
                 return;
             }
