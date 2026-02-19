@@ -978,7 +978,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const aEl = document.getElementById('atividade');
 
     // Definir valores iniciais dos seletores de tempo
-    const tempoInicial = '30:38'; // Valor padrão
+    const tempoInicial = '01:37'; // Valor padrão
     const [minutosPadrao, segundosPadrao] = tempoInicial.split(':');
     
     // Definir valores padrão primeiro
