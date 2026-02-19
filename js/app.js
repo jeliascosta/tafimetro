@@ -607,6 +607,12 @@ function preencherTabelaNotas(atividade, idade, sexo) {
 
         const tr = document.createElement('tr');
         
+        // Verificar se nota termina em 0 para aplicar estilo especial
+        if (nota % 10 === 0) {
+            tr.style.backgroundColor = '#333333';
+            tr.style.color = '#ffffff';
+        }
+        
         // Verificar se é natação para remover coluna pace
         if (atividade === 'natacao50' || atividade === 'natacao100') {
             tr.innerHTML = `
@@ -1014,6 +1020,21 @@ document.addEventListener('DOMContentLoaded', function () {
         localStorage.setItem('tafimetro_atividade', aEl.value || '');
         atualizarEmojiAtividade();
     });
+    
+    // Adicionar event listener para calcularMaior100
+    const calcularMaior100El = document.getElementById('calcularMaior100');
+    if (calcularMaior100El) {
+        // Recuperar valor salvo do localStorage
+        const vMaior100 = localStorage.getItem('tafimetro_calcularMaior100');
+        if (vMaior100 != null) {
+            calcularMaior100El.value = vMaior100;
+        }
+        
+        // Adicionar event listener para salvar mudanças
+        calcularMaior100El.addEventListener('change', () => {
+            localStorage.setItem('tafimetro_calcularMaior100', calcularMaior100El.value || '');
+        });
+    }
     
     // Atualizar emojis na inicialização
     if (sexoEl) {
@@ -1613,11 +1634,7 @@ function gerarGraficos() {
     const dadosHomens = gerarDadosParaDistancia(notas, idade, 'M', distancia);
     const dadosMulheres = gerarDadosParaDistancia(notas, idade, 'F', distancia);
 
-    // Atualizar título do gráfico
-    const graficoTitulo = document.getElementById('grafico-titulo');
-    if (graficoTitulo) {
-        graficoTitulo.textContent = atividadeNome;
-    }
+    // Título do gráfico é atualizado pela função atualizarTituloGrafico()
 
     const config = {
         type: 'line',
@@ -1698,17 +1715,11 @@ function gerarGraficos() {
     }
 }
 
-// Adicione esta função para atualizar o título
-function atualizarTituloGraficos() {
-    const idade = inputIdade.value;
-    tituloGraficos.textContent = `Gráficos: Nota vs Tempo`;
-}
-
 function onFormInputsChange() {
-    atualizarTituloGraficos();
     atualizarTituloReferencia();
     atualizarTabelaNotas();
     preencherTabelaReferencia(); // Adicionar chamada para atualizar tabela de referência
+    atualizarTituloGrafico(); // Adicionar chamada para atualizar título do gráfico
     try { gerarGraficos(); } catch (e) { }
 }
 
@@ -1727,6 +1738,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (idadeInput) {
         idadeInput.addEventListener('change', onFormInputsChange);
         idadeInput.addEventListener('input', onFormInputsChange);
+        idadeInput.addEventListener('change', atualizarTituloGrafico); // Adicionar listener para idade no DOMContentLoaded para atualizar título do gráfico
     }
     // Inicializa compositor após DOM pronto
     try { configurarCompositor(); } catch (e) { console.warn('Compositor não inicializado:', e); }
@@ -1773,14 +1785,89 @@ function atualizarTituloReferencia() {
     };
     const distancia = distancias[atividade] || 2.4;
 
-    document.getElementById('idade-ref').textContent = idade;
-    document.getElementById('distancia-ref').textContent = distancia;
-    document.getElementById('sexo-ref').textContent = sexo === 'M' ? 'Masc.' : 'Fem.';
+    // Atualizar título da tabela-notas com formato completo
+    const faixaEtaria = obterFaixaEtaria(idade, atividade);
+    const faixaFormatada = faixaEtaria.replace(/(\d+)a(\d+)/, '$1 a $2 anos');
+    const tituloTabelaNotas = document.querySelector('.tabela-notas h2');
+    if (tituloTabelaNotas) {
+        tituloTabelaNotas.innerHTML = `Nota | Tempo <span>(${atividadeNome}, ${sexo === 'M' ? 'Masculino' : 'Feminino'}, ${faixaFormatada})</span>`;
+    }
 
     // Atualiza o título da tabela de referência
     const tituloReferencia = document.getElementById('titulo-referencia');
     if (tituloReferencia) {
-        tituloReferencia.textContent = `Tempos de Referência por Nota - ${atividadeNome}`;
+        tituloReferencia.innerHTML = `Tempos de Referência:<br/>${atividadeNome}`;
+    }
+}
+
+function atualizarTituloGrafico() {
+    const idade = document.getElementById('idade').value;
+    const sexo = document.getElementById('sexo').value;
+    const atividade = document.getElementById('atividade').value;
+
+    console.log('DEBUG atualizarTituloGrafico:', { idade, sexo, atividade });
+
+    // Obter nome da atividade
+    const nomesAtividade = {
+        'corrida2400': 'Corrida 2.4km',
+        'corrida3200': 'Corrida 3.2km',
+        'natacao50': 'Natação 50m',
+        'natacao100': 'Natação 100m',
+        'caminhada4800': 'Caminhada 4.8km'
+    };
+    const atividadeNome = nomesAtividade[atividade] || 'Atividade';
+
+    // Atualizar título do gráfico
+    const tituloGrafico = document.getElementById('grafico-titulo');
+    if (tituloGrafico) {
+        const faixaEtaria = obterFaixaEtaria(idade, atividade);
+        console.log('DEBUG faixaEtaria:', faixaEtaria);
+        const faixaFormatada = faixaEtaria.replace(/(\d+)a(\d+)/, '$1 a $2 anos');
+        console.log('DEBUG faixaFormatada:', faixaFormatada);
+        tituloGrafico.textContent = `${atividadeNome}, ${faixaFormatada}`;
+        console.log('DEBUG título final:', tituloGrafico.textContent);
+    } else {
+        console.log('DEBUG: Elemento grafico-titulo não encontrado');
+    }
+}
+
+function atualizarTituloReferencia() {
+    const idade = document.getElementById('idade').value;
+    const sexo = document.getElementById('sexo').value;
+    const atividade = document.getElementById('atividade').value;
+
+    // Obter nome da atividade
+    const nomesAtividade = {
+        'corrida2400': 'Corrida 2.4km',
+        'corrida3200': 'Corrida 3.2km',
+        'natacao50': 'Natação 50m',
+        'natacao100': 'Natação 100m',
+        'caminhada4800': 'Caminhada 4.8km'
+    };
+    const atividadeNome = nomesAtividade[atividade] || 'Atividade';
+
+    // Obter distância da atividade selecionada
+    const distancias = {
+        'corrida2400': 2.4,
+        'corrida3200': 3.2,
+        'natacao50': 0.05,
+        'natacao100': 0.1,
+        'caminhada4800': 4.8
+    };
+    const distancia = distancias[atividade] || 2.4;
+
+    // Atualizar título da tabela-notas com formato completo
+    const faixaEtaria = obterFaixaEtaria(idade, atividade);
+    const faixaFormatada = faixaEtaria.replace(/(\d+)a(\d+)/, '$1 a $2 anos');
+    const tituloTabelaNotas = document.querySelector('.tabela-notas h2');
+    if (tituloTabelaNotas) {
+        tituloTabelaNotas.innerHTML = `Nota | Tempo <span>(${atividadeNome}, ${sexo === 'M' ? 'Masculino' : 'Feminino'}, ${faixaFormatada})</span>`;
+    }
+
+    // Atualiza o título da tabela de referência
+    const tituloReferencia = document.getElementById('titulo-referencia');
+    if (tituloReferencia) {
+        tituloReferencia.innerHTML = `Tempos de Referência:<br/>${atividadeNome}`;
     }
 }
 
@@ -1788,6 +1875,20 @@ function atualizarTituloReferencia() {
 
 
 // Adicionar listener para o toggle de mostrar/ocultar Pace (removido junto com hustle)
+
+// Adicionar listeners para idade e sexo atualizarem o título do gráfico
+document.addEventListener('DOMContentLoaded', function () {
+    const idadeEl = document.getElementById('idade');
+    const sexoEl = document.getElementById('sexo');
+    
+    if (idadeEl) {
+        idadeEl.addEventListener('change', onFormInputsChange);
+    }
+    
+    if (sexoEl) {
+        sexoEl.addEventListener('change', onFormInputsChange);
+    }
+});
 
 // Adicionar listener para o toggle de mostrar/ocultar Pace
 document.getElementById('togglePace').addEventListener('change', function () {
@@ -1803,11 +1904,6 @@ document.getElementById('togglePace').addEventListener('change', function () {
             container.style.display = isChecked ? 'flex' : 'none';
         }
     });
-
-    // Atualizar o card de compartilhamento
-    if (typeof atualizarCardOverlayDoShareCard === 'function') {
-        atualizarCardOverlayDoShareCard();
-    }
 });
 
 // Verificar preferências salvas ao carregar a página
@@ -2638,5 +2734,4 @@ document.getElementById('calcForm').onsubmit = function (e) {
     if (originalSubmitHandler) {
         return originalSubmitHandler.call(this, e);
     }
-};
-
+};;

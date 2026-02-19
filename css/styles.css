@@ -134,11 +134,15 @@ label {
 input[type="text"],
 input[type="number"],
 select {
-    width: 95%;
     padding: 10px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
     border: 1px solid #ccc;
     border-radius: 4px;
+}
+
+select {
+    width: 100%;
+    height: 38px
 }
 
 button {
@@ -184,11 +188,34 @@ button:hover {
     margin-bottom: 15px;
 }
 
-.tabela-referencia {
+/* .tabela-referencia {
     margin-top: 2rem;
     padding: 1rem;
     background-color: #f8f9fa;
     border-radius: 8px;
+} */
+
+.seccion-graficos {
+    margin-bottom: 90px;
+}
+
+.tabela-referencia {
+    margin-top: 6.5rem;
+    margin-bottom: 2rem;
+}
+
+.tabela-notas h2 {
+    /* font-size: 1.1rem; */
+    /* font-weight: 700; */
+    color: #333;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+}
+
+.tabela-notas h2 span {
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: #666;
 }
 
 .table-responsive {
@@ -245,7 +272,7 @@ tr:hover {
     max-height: 250px;
     display: flex;
     flex-direction: column;
-    margin-top: 20px;
+    margin-top: -18px;
 }
 
 .grid-graficos .grafico-wrap canvas {
