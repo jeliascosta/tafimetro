@@ -417,6 +417,7 @@ tr:hover {
 .share-card .share-top .main {
     display: inline-block;
     position: relative;
+    font-style: italic;
     /* referencia para .rev absoluta */
 }
 
