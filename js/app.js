@@ -620,10 +620,11 @@ async function gerarCardParaExportacao() {
     // Remover estilos temporariamente
     card.style.borderRadius = '0';
     card.style.boxShadow = 'none';
+    const scale = 4; // Aumentar escala para melhorar qualidade
 
     try {
         const canvas = await html2canvas(card, {
-            scale: 3,
+            scale,
             backgroundColor: null,
             useCORS: true,
             logging: false
@@ -635,18 +636,18 @@ async function gerarCardParaExportacao() {
 
         // Cortar 2px de cada lado (total 6px considerando scale 3)
         const ctx = canvas.getContext('2d');
-        const pixelsParaCortar = 6; // 2px × 3 (scale) = 6px
-        const pixelsLaterais = 6; // 2px × 3 (scale) = 6px de cada lado
+        const pixelsParaCortar = 2 * scale; // 2px × 3 (scale) = 6px
+        const pixelsLaterais = 2 * scale; // 2px × 3 (scale) = 6px de cada lado
         
         // Cortar laterais e inferior
         const imageData = ctx.getImageData(
             pixelsLaterais, 
             0, 
-            canvas.width - (pixelsLaterais * 2), 
+            canvas.width - pixelsLaterais, 
             canvas.height - pixelsParaCortar
         );
         const croppedCanvas = document.createElement('canvas');
-        croppedCanvas.width = canvas.width - (pixelsLaterais * 2);
+        croppedCanvas.width = canvas.width - pixelsLaterais;
         croppedCanvas.height = canvas.height - pixelsParaCortar;
         croppedCanvas.getContext('2d').putImageData(imageData, 0, 0);
 
