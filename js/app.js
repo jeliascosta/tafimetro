@@ -522,6 +522,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const vI = localStorage.getItem('tafimetro_idade');
     const vS = localStorage.getItem('tafimetro_sexo');
     const vA = localStorage.getItem('tafimetro_atividade');
+    const vN = localStorage.getItem('nome');
     
     // Aplicar valores salvos (se existirem)
     if (tEl && vT != null) {
@@ -532,6 +533,8 @@ document.addEventListener('DOMContentLoaded', function () {
     if (iEl && vI != null) iEl.value = vI;
     if (sexoEl && vS != null) sexoEl.value = vS;
     if (aEl && vA != null) aEl.value = vA;
+    const nomeInput = document.getElementById('nome');
+    if (nomeInput && vN != null) nomeInput.value = vN;
     
     // Adicionar event listeners para salvar mudanças
     if (tEl) tEl.addEventListener('input', () => {
@@ -552,6 +555,11 @@ document.addEventListener('DOMContentLoaded', function () {
         localStorage.setItem('tafimetro_atividade', aEl.value || '');
         atualizarEmojiAtividade();
     });
+    if (nomeInput) {
+        nomeInput.addEventListener('input', function() {
+            localStorage.setItem('nome', nomeInput.value);
+        });
+    }
     
     // Adicionar event listener para calcularMaior100
     const calcularMaior100El = document.getElementById('calcularMaior100');
@@ -990,6 +998,7 @@ async function gerarCardParaExportacao() {
             const scoreAtividadeEl = document.getElementById('scoreAtividade');
             const scoreAtividadeTextEl = document.getElementById('scoreAtividadeText');
             const scoreFaixaEtariaEl = document.getElementById('scoreFaixaEtaria');
+            const scoreNomeEl = document.getElementById('scoreNome');
             
             if (scoreAtividadeEl) {
                 scoreAtividadeEl.style.color = atividadeTextColor;
@@ -1000,6 +1009,9 @@ async function gerarCardParaExportacao() {
             if (scoreFaixaEtariaEl) {
                 scoreFaixaEtariaEl.style.color = faixaTextColor;
             }
+            if (scoreNomeEl) {
+                scoreNomeEl.style.color = textColor;
+            }               
             
             document.getElementById('scoreAtividadeText').textContent = atividadeNome;
             document.getElementById('scoreFaixaEtaria').textContent = "🔢 "+faixaEtariaNome;
@@ -1397,8 +1409,26 @@ function atualizarTituloReferencia() {
     }
 }
 
+// Atualizar a visibilidade do toggleNome com base no valor do nome
+function atualizarVisibilidadeToggleNome() {
+    const nomeInput = document.getElementById('nome');
+    const nome = nomeInput.value.trim();
+    const toggleNomeContainer = document.querySelector('#toggleNome').closest('div');
 
+    if (nome) {
+        toggleNomeContainer.style.display = 'flex';
+    } else {
+        toggleNomeContainer.style.display = 'none';
+    }
+}
 
+// Adicionar listener para o botão Desbrave
+const desbraveButton = document.querySelector('button[type="submit"]');
+if (desbraveButton) {
+    desbraveButton.addEventListener('click', function(event) {
+        atualizarVisibilidadeToggleNome();
+    });
+}
 
 // Adicionar listener para o toggle de mostrar/ocultar Pace (removido junto com hustle)
 
@@ -2266,12 +2296,21 @@ document.getElementById('calcForm').addEventListener('submit', function(event) {
     event.preventDefault();
 
     const nome = document.getElementById('nome').value.trim();
-    const cardNome = document.getElementById('cardNome');
+    const scoreNome = document.getElementById('scoreNome');
 
     if (nome) {
-        cardNome.textContent = nome;
-        cardNome.style.display = 'block';
+        scoreNome.textContent = nome;
+        scoreNome.style.display = 'block';
     } else {
-        cardNome.style.display = 'none';
+        scoreNome.style.display = 'none';
+    }
+});
+
+document.getElementById('toggleNome').addEventListener('change', function(event) {
+    const scoreNome = document.getElementById('scoreNome');
+    if (event.target.checked) {
+        scoreNome.style.display = 'block';
+    } else {
+        scoreNome.style.display = 'none';
     }
 });
