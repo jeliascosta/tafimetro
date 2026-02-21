@@ -89,16 +89,16 @@ function preencherTabelaNotas(atividade, idade, sexo) {
     for (let nota = 100; nota >= 50; nota--) {
         notas.push(nota);
     }
-    
+
     for (const nota of notas) {
         let tempo = '--';
         let pace = '--';
-        
+
         if (pontosFaixa[nota]) {
             // Nota existe diretamente na tabela
             tempo = pontosFaixa[nota];
             const tempoSegundos = tempoStringParaSegundos(tempo);
-            
+
             // Calcular pace
             if (atividade === 'natacao50' || atividade === 'natacao100') {
                 // Para natação: pace por 100m
@@ -119,7 +119,7 @@ function preencherTabelaNotas(atividade, idade, sexo) {
                 tempo = tempoParaNotaEspecifica(nota, idade, sexo, atividade);
                 if (tempo !== '--') {
                     const tempoSegundos = tempoStringParaSegundos(tempo);
-                    
+
                     // Calcular pace
                     if (atividade === 'natacao50' || atividade === 'natacao100') {
                         // Para natação: pace por 100m
@@ -138,13 +138,13 @@ function preencherTabelaNotas(atividade, idade, sexo) {
         }
 
         const tr = document.createElement('tr');
-        
+
         // Verificar se nota termina em 0 para aplicar estilo especial
         if (nota % 10 === 0) {
             tr.style.backgroundColor = '#333333';
             tr.style.color = '#ffffff';
         }
-        
+
         // Verificar se é natação para remover coluna pace
         if (atividade === 'natacao50' || atividade === 'natacao100') {
             tr.innerHTML = `
@@ -272,7 +272,7 @@ function interpolarPontos(tempoSegundos, pontos, temposPorPonto) {
         // Extrapolation: continuar a tendência além de 100
         const tempo100 = tempoStringParaSegundos(temposPorPonto[100]);
         const tempo90 = tempoStringParaSegundos(temposPorPonto[90]);
-        
+
         if (pontos.length >= 2 && pontos[pontos.length - 1] === 100) {
             // Calcular taxa de melhora entre 90 e 100
             const taxaMelhora = (tempo90 - tempo100) / 10; // segundos por ponto acima de 90
@@ -294,7 +294,7 @@ function interpolarPontos(tempoSegundos, pontos, temposPorPonto) {
                 return 100 + pontosAcima100;
             }
         }
-        
+
         const ultimoPonto = pontos[pontos.length - 1];
         const tempoUltimo = tempoStringParaSegundos(temposPorPonto[ultimoPonto]);
         return tempoSegundos <= tempoUltimo ? ultimoPonto : 0;
@@ -303,7 +303,7 @@ function interpolarPontos(tempoSegundos, pontos, temposPorPonto) {
     // Interpolação linear normal
     const tempoInferior = tempoStringParaSegundos(temposPorPonto[pontoInferior]);
     const tempoSuperior = tempoStringParaSegundos(temposPorPonto[pontoSuperior]);
-    
+
     const proporcao = (tempoSegundos - tempoInferior) / (tempoSuperior - tempoInferior);
     return pontoInferior + proporcao * (pontoSuperior - pontoInferior);
 }
@@ -363,30 +363,30 @@ function atualizarEmojiAtividade() {
 function preencherTabelaReferencia() {
     const tbody = document.getElementById('tabelaTemposReferencia');
     if (!tbody) return;
-    
+
     tbody.innerHTML = '';
-    
+
     // Obter atividade selecionada
     const atividadeSelect = document.getElementById('atividade');
     if (!atividadeSelect) return;
-    
+
     const atividade = atividadeSelect.value;
-    
+
     // Obter idade e sexo selecionados
     const idade = parseInt(document.getElementById('idade').value) || 30;
     const sexo = document.getElementById('sexo').value;
-    
+
     // Obter todas as faixas etárias para a atividade
     const faixasEtarias = obterTodasFaixasEtarias(atividade);
-    
+
     // Definir notas de 100 para 50 com decremento de 10
     const notas = [100, 90, 80, 70, 60, 50];
-    
+
     // Criar cabeçalho dinâmico
     const thead = tbody.previousElementSibling;
     if (thead) {
         let headerHtml = '<tr><th>Faixa Etária</th>';
-        
+
         // Adicionar colunas para cada nota
         for (const nota of notas) {
             headerHtml += `<th>Nota ${nota}</th>`;
@@ -394,44 +394,44 @@ function preencherTabelaReferencia() {
         headerHtml += '</tr>';
         thead.innerHTML = headerHtml;
     }
-    
+
     // Preencher tabela com faixas etárias intercaladas por sexo
     for (const faixa of faixasEtarias) {
         // Linha masculino
         const trMasc = document.createElement('tr');
         let rowHtmlMasc = `<td>${faixa.nome} (M)</td>`;
-        
+
         for (const nota of notas) {
             let tempo = '--';
-            
+
             try {
                 tempo = tempoParaNotaEspecifica(nota, faixa.idadeRepresentativa, 'M', atividade);
             } catch (err) {
                 console.warn(`Erro ao obter tempo masculino para ${faixa.nome} nota ${nota}:`, err);
             }
-            
+
             rowHtmlMasc += `<td>${tempo}</td>`;
         }
-        
+
         trMasc.innerHTML = rowHtmlMasc;
         tbody.appendChild(trMasc);
-        
+
         // Linha feminino
         const trFem = document.createElement('tr');
         let rowHtmlFem = `<td>${faixa.nome} (F)</td>`;
-        
+
         for (const nota of notas) {
             let tempo = '--';
-            
+
             try {
                 tempo = tempoParaNotaEspecifica(nota, faixa.idadeRepresentativa, 'F', atividade);
             } catch (err) {
                 console.warn(`Erro ao obter tempo feminino para ${faixa.nome} nota ${nota}:`, err);
             }
-            
+
             rowHtmlFem += `<td>${tempo}</td>`;
         }
-        
+
         trFem.innerHTML = rowHtmlFem;
         tbody.appendChild(trFem);
     }
@@ -440,7 +440,7 @@ function preencherTabelaReferencia() {
 // Função para obter todas as faixas etárias de uma atividade
 function obterTodasFaixasEtarias(atividade) {
     const faixas = [];
-    
+
     if (atividade === 'natacao50' || atividade === 'natacao100') {
         faixas.push(
             { nome: '18-30', idadeRepresentativa: 24 },
@@ -468,7 +468,7 @@ function obterTodasFaixasEtarias(atividade) {
             { nome: '55+', idadeRepresentativa: 58 }
         );
     }
-    
+
     return faixas;
 }
 
@@ -476,11 +476,11 @@ function obterTodasFaixasEtarias(atividade) {
 function tempoParaNota100(idade, sexo, atividade) {
     const faixaEtaria = obterFaixaEtaria(idade, atividade);
     const tabela = tabelasPontuacao[atividade];
-    
+
     if (!tabela || !tabela[sexo === 'M' ? 'masculino' : 'feminino'] || !tabela[sexo === 'M' ? 'masculino' : 'feminino'][faixaEtaria]) {
         return '--';
     }
-    
+
     const pontosFaixa = tabela[sexo === 'M' ? 'masculino' : 'feminino'][faixaEtaria];
     return pontosFaixa[100] || '--';
 }
@@ -512,18 +512,18 @@ document.addEventListener('DOMContentLoaded', function () {
     // Definir valores iniciais dos seletores de tempo
     const tempoInicial = '01:37'; // Valor padrão
     const [minutosPadrao, segundosPadrao] = tempoInicial.split(':');
-    
+
     // Definir valores padrão primeiro
     if (tEl) tEl.value = minutosPadrao;
     if (sEl) sEl.value = segundosPadrao;
-    
+
     // Recuperar valores salvos do localStorage
     const vT = localStorage.getItem('tafimetro_tempo');
     const vI = localStorage.getItem('tafimetro_idade');
     const vS = localStorage.getItem('tafimetro_sexo');
     const vA = localStorage.getItem('tafimetro_atividade');
-    const vN = localStorage.getItem('nome');
-    
+    const vN = localStorage.getItem('tafimetro_nome');
+
     // Aplicar valores salvos (se existirem)
     if (tEl && vT != null) {
         const [minutos, segundos] = vT.split(':');
@@ -535,32 +535,31 @@ document.addEventListener('DOMContentLoaded', function () {
     if (aEl && vA != null) aEl.value = vA;
     const nomeInput = document.getElementById('nome');
     if (nomeInput && vN != null) nomeInput.value = vN;
-    
+
     // Adicionar event listeners para salvar mudanças
     if (tEl) tEl.addEventListener('input', () => {
         const minutos = tEl.value;
         const segundos = sEl ? sEl.value : '00';
         localStorage.setItem('tafimetro_tempo', `${minutos}:${segundos}`);
     });
-    
+
     if (sEl) sEl.addEventListener('input', () => {
         const minutos = tEl ? tEl.value : '30';
         const segundos = sEl.value;
         localStorage.setItem('tafimetro_tempo', `${minutos}:${segundos}`);
     });
-    
+
     if (iEl) iEl.addEventListener('change', () => localStorage.setItem('tafimetro_idade', iEl.value || ''));
     if (sexoEl) sexoEl.addEventListener('change', () => localStorage.setItem('tafimetro_sexo', sexoEl.value || ''));
     if (aEl) aEl.addEventListener('change', () => {
         localStorage.setItem('tafimetro_atividade', aEl.value || '');
         atualizarEmojiAtividade();
     });
-    if (nomeInput) {
-        nomeInput.addEventListener('input', function() {
-            localStorage.setItem('nome', nomeInput.value);
+    if (nomeInput)
+        nomeInput.addEventListener('input', function () {
+            localStorage.setItem('tafimetro_nome', nomeInput.value);
         });
-    }
-    
+
     // Adicionar event listener para calcularMaior100
     const calcularMaior100El = document.getElementById('calcularMaior100');
     if (calcularMaior100El) {
@@ -569,13 +568,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (vMaior100 != null) {
             calcularMaior100El.value = vMaior100;
         }
-        
+
         // Adicionar event listener para salvar mudanças
         calcularMaior100El.addEventListener('change', () => {
             localStorage.setItem('tafimetro_calcularMaior100', calcularMaior100El.value || '');
         });
     }
-    
+
     // Atualizar emojis na inicialização
     if (sexoEl) {
         sexoEl.addEventListener('change', () => {
@@ -584,7 +583,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         atualizarEmojisPorSexo(sexoEl.value);
     }
-    
+
     // Atualizar emoji da atividade na inicialização
     atualizarEmojiAtividade();
 
@@ -596,7 +595,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (savedState !== null) {
             toggleFaixa.checked = savedState === 'true';
         }
-        
+
         toggleFaixa.addEventListener('change', () => {
             const scoreFaixaEtaria = document.getElementById('scoreFaixaEtaria');
             if (scoreFaixaEtaria) {
@@ -605,7 +604,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Salvar estado no localStorage
             localStorage.setItem('tafimetro_mostrarFaixa', toggleFaixa.checked);
         });
-        
+
         // Aplicar estado inicial
         const scoreFaixaEtaria = document.getElementById('scoreFaixaEtaria');
         if (scoreFaixaEtaria) {
@@ -615,60 +614,60 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // Função unificada para gerar card com tratamento de estilos
-async function gerarCardParaExportacao() {
-    const card = document.getElementById('shareCard');
-    if (!card || card.style.display === 'none') {
-        throw new Error('Nenhum card gerado ainda!');
+    async function gerarCardParaExportacao() {
+        const card = document.getElementById('shareCard');
+        if (!card || card.style.display === 'none') {
+            throw new Error('Nenhum card gerado ainda!');
+        }
+
+        // Salvar os estilos originais
+        const originalBorderRadius = card.style.borderRadius;
+        const originalBoxShadow = card.style.boxShadow;
+
+        // Remover estilos temporariamente
+        card.style.borderRadius = '0';
+        card.style.boxShadow = 'none';
+        const scale = 4; // Aumentar escala para melhorar qualidade
+
+        try {
+            const canvas = await html2canvas(card, {
+                scale,
+                backgroundColor: null,
+                useCORS: true,
+                logging: false
+            });
+
+            // Restaurar os estilos originais
+            card.style.borderRadius = originalBorderRadius;
+            card.style.boxShadow = originalBoxShadow;
+
+            // Cortar 2px de cada lado (total 6px considerando scale 3)
+            const ctx = canvas.getContext('2d');
+            const pixelsParaCortar = 2 * scale; // 2px × 3 (scale) = 6px
+            const pixelsLaterais = 2 * scale; // 2px × 3 (scale) = 6px de cada lado
+
+            // Cortar laterais e inferior
+            const imageData = ctx.getImageData(
+                pixelsLaterais,
+                0,
+                canvas.width - pixelsLaterais,
+                canvas.height - pixelsParaCortar
+            );
+            const croppedCanvas = document.createElement('canvas');
+            croppedCanvas.width = canvas.width - pixelsLaterais;
+            croppedCanvas.height = canvas.height - pixelsParaCortar;
+            croppedCanvas.getContext('2d').putImageData(imageData, 0, 0);
+
+            return croppedCanvas;
+        } catch (error) {
+            // Restaurar estilos em caso de erro
+            card.style.borderRadius = originalBorderRadius;
+            card.style.boxShadow = originalBoxShadow;
+            throw error;
+        }
     }
 
-    // Salvar os estilos originais
-    const originalBorderRadius = card.style.borderRadius;
-    const originalBoxShadow = card.style.boxShadow;
-
-    // Remover estilos temporariamente
-    card.style.borderRadius = '0';
-    card.style.boxShadow = 'none';
-    const scale = 4; // Aumentar escala para melhorar qualidade
-
-    try {
-        const canvas = await html2canvas(card, {
-            scale,
-            backgroundColor: null,
-            useCORS: true,
-            logging: false
-        });
-
-        // Restaurar os estilos originais
-        card.style.borderRadius = originalBorderRadius;
-        card.style.boxShadow = originalBoxShadow;
-
-        // Cortar 2px de cada lado (total 6px considerando scale 3)
-        const ctx = canvas.getContext('2d');
-        const pixelsParaCortar = 2 * scale; // 2px × 3 (scale) = 6px
-        const pixelsLaterais = 2 * scale; // 2px × 3 (scale) = 6px de cada lado
-        
-        // Cortar laterais e inferior
-        const imageData = ctx.getImageData(
-            pixelsLaterais, 
-            0, 
-            canvas.width - pixelsLaterais, 
-            canvas.height - pixelsParaCortar
-        );
-        const croppedCanvas = document.createElement('canvas');
-        croppedCanvas.width = canvas.width - pixelsLaterais;
-        croppedCanvas.height = canvas.height - pixelsParaCortar;
-        croppedCanvas.getContext('2d').putImageData(imageData, 0, 0);
-
-        return croppedCanvas;
-    } catch (error) {
-        // Restaurar estilos em caso de erro
-        card.style.borderRadius = originalBorderRadius;
-        card.style.boxShadow = originalBoxShadow;
-        throw error;
-    }
-}
-
-// Handler para copiar/baixar somente o card (movido do index.html)
+    // Handler para copiar/baixar somente o card (movido do index.html)
     const btnShareCard = document.getElementById('copyCardBtn');
     if (!btnShareCard) return;
     btnShareCard.addEventListener('click', async () => {
@@ -766,7 +765,7 @@ async function gerarCardParaExportacao() {
             const segundos = document.getElementById('tempoSegundos').value;
             const tempo = `${minutos}:${segundos}`;
             const atividade = document.getElementById('atividade').value;
-            
+
             // Obter nome da atividade para exibição
             const nomesAtividade = {
                 'corrida2400': 'Corrida | 2.4km',
@@ -922,7 +921,7 @@ async function gerarCardParaExportacao() {
             let textColor;
             let atividadeTextColor;
             let faixaTextColor;
-            
+
             if (notaInteiro >= 100) {
                 // Nota 100 ou maior: usar esquema dourado
                 textColor = sexo === 'F' ? '#2c0045ff' : '#002157ff';
@@ -953,7 +952,7 @@ async function gerarCardParaExportacao() {
                 const tempoVal = `${minutos}:${segundos}`;
                 const seg = tempoStringParaSegundos(tempoVal);
                 displayTempo = segundosParaMMSS(seg);
-                
+
                 // Verificar se é natação para mostrar pace por 100m
                 if (atividade === 'natacao50' || atividade === 'natacao100') {
                     // Para natação: calcular pace por 100m diretamente
@@ -993,13 +992,13 @@ async function gerarCardParaExportacao() {
 
             document.getElementById('cardDate').textContent = hoje;
             document.getElementById('scoreBig').textContent = notaInteiro;
-            
+
             // Aplicar cores dinâmicas baseadas na nota
             const scoreAtividadeEl = document.getElementById('scoreAtividade');
             const scoreAtividadeTextEl = document.getElementById('scoreAtividadeText');
             const scoreFaixaEtariaEl = document.getElementById('scoreFaixaEtaria');
             const scoreNomeEl = document.getElementById('scoreNome');
-            
+
             if (scoreAtividadeEl) {
                 scoreAtividadeEl.style.color = atividadeTextColor;
             }
@@ -1011,13 +1010,13 @@ async function gerarCardParaExportacao() {
             }
             if (scoreNomeEl) {
                 scoreNomeEl.style.color = textColor;
-            }               
-            
+            }
+
             document.getElementById('scoreAtividadeText').textContent = atividadeNome;
-            document.getElementById('scoreFaixaEtaria').textContent = "🔢 "+faixaEtariaNome;
+            document.getElementById('scoreFaixaEtaria').textContent = "🔢 " + faixaEtariaNome;
             document.getElementById('zoneSmall').textContent = zone;
             document.getElementById('cardTempo').textContent = displayTempo;
-            
+
             // Exibir pace com unidade correta
             if (atividade === 'natacao50' || atividade === 'natacao100') {
                 document.getElementById('cardPace').textContent = `${displayPace} /100m`;
@@ -1106,7 +1105,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // Gera dados (array de {x: tempoSegundos, y: nota}) para uma distância e sexo
 function gerarDadosParaDistancia(notas, idade, sexo, km) {
     const dados = [];
-    
+
     // Mapear distância para atividade
     const atividadePorDistancia = {
         2.4: 'corrida2400',
@@ -1115,9 +1114,9 @@ function gerarDadosParaDistancia(notas, idade, sexo, km) {
         0.1: 'natacao100',
         4.8: 'caminhada4800'
     };
-    
+
     const atividade = atividadePorDistancia[km] || 'corrida2400';
-    
+
     for (const nota of notas) {
         try {
             // Usar a nova função para obter tempo para nota específica
@@ -1145,7 +1144,7 @@ function gerarGraficos() {
 
     const idade = parseInt(document.getElementById('idade')?.value) || 30;
     const atividade = document.getElementById('atividade')?.value || 'corrida2400';
-    
+
     // Mapear atividade para distância
     const distancias = {
         'corrida2400': 2.4,
@@ -1154,9 +1153,9 @@ function gerarGraficos() {
         'natacao100': 0.1,
         'caminhada4800': 4.8
     };
-    
+
     const distancia = distancias[atividade] || 2.4;
-    
+
     // Obter nomes das atividades
     const nomesAtividade = {
         'corrida2400': 'Corrida 2.4km',
@@ -1296,7 +1295,7 @@ function atualizarTabelaNotas() {
     const idade = parseInt(document.getElementById('idade').value);
     const sexo = document.getElementById('sexo').value;
     const atividade = document.getElementById('atividade').value;
-    
+
     // Usar a nova função para preencher a tabela
     preencherTabelaNotas(atividade, idade, sexo);
 }
@@ -1425,7 +1424,7 @@ function atualizarVisibilidadeToggleNome() {
 // Adicionar listener para o botão Desbrave
 const desbraveButton = document.querySelector('button[type="submit"]');
 if (desbraveButton) {
-    desbraveButton.addEventListener('click', function(event) {
+    desbraveButton.addEventListener('click', function (event) {
         atualizarVisibilidadeToggleNome();
     });
 }
@@ -1436,11 +1435,11 @@ if (desbraveButton) {
 document.addEventListener('DOMContentLoaded', function () {
     const idadeEl = document.getElementById('idade');
     const sexoEl = document.getElementById('sexo');
-    
+
     if (idadeEl) {
         idadeEl.addEventListener('change', onFormInputsChange);
     }
-    
+
     if (sexoEl) {
         sexoEl.addEventListener('change', onFormInputsChange);
     }
@@ -1452,7 +1451,7 @@ document.getElementById('togglePace').addEventListener('change', function () {
     const isChecked = this.checked;
 
     // Salvar preferência no localStorage
-    localStorage.setItem('showPace', isChecked);
+    localStorage.setItem('tafimetro_mostrarPace', isChecked);
 
     // Mostrar ou ocultar apenas o container de Pace (segundo meta-item)
     paceContainers.forEach((container, index) => {
@@ -1466,14 +1465,14 @@ document.getElementById('togglePace').addEventListener('change', function () {
 document.addEventListener('DOMContentLoaded', function () {
     const togglePace = document.getElementById('togglePace');
     const paceContainers = document.querySelectorAll('.meta-item');
-    const savedPacePreference = localStorage.getItem('showPace');
-    const showPace = savedPacePreference === null ? true : savedPacePreference === 'true';
+    const savedPacePreference = localStorage.getItem('tafimetro_mostrarPace');
+    const tafimetro_mostrarPace = savedPacePreference === null ? true : savedPacePreference === 'true';
 
     // Aplicar preferência do Pace
-    togglePace.checked = showPace;
+    togglePace.checked = tafimetro_mostrarPace;
     paceContainers.forEach((container, index) => {
         if (index === 1) { // Segundo meta-item é o Pace
-            container.style.display = showPace ? 'flex' : 'none';
+            container.style.display = tafimetro_mostrarPace ? 'flex' : 'none';
         }
     });
 });
@@ -2292,7 +2291,7 @@ document.getElementById('calcForm').onsubmit = function (e) {
     }
 };
 
-document.getElementById('calcForm').addEventListener('submit', function(event) {
+document.getElementById('calcForm').addEventListener('submit', function (event) {
     event.preventDefault();
 
     const nome = document.getElementById('nome').value.trim();
@@ -2306,7 +2305,7 @@ document.getElementById('calcForm').addEventListener('submit', function(event) {
     }
 });
 
-document.getElementById('toggleNome').addEventListener('change', function(event) {
+document.getElementById('toggleNome').addEventListener('change', function (event) {
     const scoreNome = document.getElementById('scoreNome');
     if (event.target.checked) {
         scoreNome.style.display = 'block';
