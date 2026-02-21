@@ -1037,7 +1037,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (scoreNomeEl) {
                 const nome = document.getElementById('nome').value.trim();
                 scoreNomeEl.style.color = textColor;
-                scoreNomeEl.textContent = nome? `🫡 ${nome}` : '';
+                scoreNomeEl.textContent = nome? `👤 ${nome}` : '';
             }
 
             document.getElementById('zoneSmall').textContent = zone;
