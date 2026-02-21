@@ -1623,6 +1623,7 @@ function configurarCompositor() {
 
     if (imagem.complete) {
         // Se a imagem já estiver carregada, aplicar imediatamente
+
         aplicarConfigAposCarregamento();
     } else {
         // Caso contrário, aguardar o carregamento
@@ -1997,8 +1998,7 @@ function garantirCardOverlay() {
     // Aplicar border radius ao card recém-criado
     if (currentBorderRadius) {
         const { 'top-left': tl, 'top-right': tr, 'bottom-right': br, 'bottom-left': bl } = currentBorderRadius;
-        const borderRadius = `${tl}px ${tr}px ${br}px ${bl}px`;
-        clone.style.borderRadius = borderRadius;
+        clone.style.borderRadius = `${tl}px ${tr}px ${br}px ${bl}px`;
     }
 
     // aplica escala do slider via transform se existir
@@ -2260,4 +2260,18 @@ document.getElementById('calcForm').onsubmit = function (e) {
     if (originalSubmitHandler) {
         return originalSubmitHandler.call(this, e);
     }
-};;
+};
+
+document.getElementById('calcForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    const nome = document.getElementById('nome').value.trim();
+    const cardNome = document.getElementById('cardNome');
+
+    if (nome) {
+        cardNome.textContent = nome;
+        cardNome.style.display = 'block';
+    } else {
+        cardNome.style.display = 'none';
+    }
+});
