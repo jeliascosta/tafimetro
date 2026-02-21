@@ -620,7 +620,7 @@ async function gerarCardParaExportacao() {
     // Remover estilos temporariamente
     card.style.borderRadius = '0';
     card.style.boxShadow = 'none';
-    const scale = 4; // Aumentar escala para melhorar qualidade
+    const scale = 5; // Aumentar escala para melhorar qualidade
 
     try {
         const canvas = await html2canvas(card, {
