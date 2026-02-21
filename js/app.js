@@ -1805,8 +1805,6 @@ function atualizarTituloGrafico() {
     const sexo = document.getElementById('sexo').value;
     const atividade = document.getElementById('atividade').value;
 
-    console.log('DEBUG atualizarTituloGrafico:', { idade, sexo, atividade });
-
     // Obter nome da atividade
     const nomesAtividade = {
         'corrida2400': 'Corrida 2.4km',
@@ -1821,13 +1819,8 @@ function atualizarTituloGrafico() {
     const tituloGrafico = document.getElementById('grafico-titulo');
     if (tituloGrafico) {
         const faixaEtaria = obterFaixaEtaria(idade, atividade);
-        console.log('DEBUG faixaEtaria:', faixaEtaria);
         const faixaFormatada = faixaEtaria.replace(/(\d+)a(\d+)/, '$1 a $2 anos');
-        console.log('DEBUG faixaFormatada:', faixaFormatada);
         tituloGrafico.textContent = `${atividadeNome}, ${faixaFormatada}`;
-        console.log('DEBUG título final:', tituloGrafico.textContent);
-    } else {
-        console.log('DEBUG: Elemento grafico-titulo não encontrado');
     }
 }
 
