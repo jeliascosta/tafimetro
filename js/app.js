@@ -612,6 +612,30 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Handler para toggle do nome
+    const toggleNome = document.getElementById('toggleNome');
+    if (toggleNome) {
+        // Carregar estado salvo do localStorage
+        const savedState = localStorage.getItem('tafimetro_mostrarNome');
+        if (savedState !== null) {
+            toggleNome.checked = savedState === 'true';
+        }
+
+        toggleNome.addEventListener('change', () => {
+            const scoreNome = document.getElementById('scoreNome');
+            if (scoreNome) {
+                scoreNome.style.display = toggleNome.checked ? 'flex' : 'none';
+            }
+            // Salvar estado no localStorage
+            localStorage.setItem('tafimetro_mostrarNome', toggleNome.checked);
+        });
+
+        // Aplicar estado inicial
+        const scoreNome = document.getElementById('scoreNome');
+        if (scoreNome) {
+            scoreNome.style.display = toggleNome.checked ? 'flex' : 'none';
+        }
+    }
 
     // Função unificada para gerar card com tratamento de estilos
     async function gerarCardParaExportacao() {
@@ -1004,16 +1028,18 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             if (scoreAtividadeTextEl) {
                 scoreAtividadeTextEl.style.color = atividadeTextColor;
+                scoreAtividadeTextEl.textContent = atividadeNome;
             }
             if (scoreFaixaEtariaEl) {
                 scoreFaixaEtariaEl.style.color = faixaTextColor;
+                scoreFaixaEtariaEl.textContent = "🔢 " + faixaEtariaNome;
             }
             if (scoreNomeEl) {
+                const nome = document.getElementById('nome').value.trim();
                 scoreNomeEl.style.color = textColor;
+                scoreNomeEl.textContent = nome? `⚓ ${nome}` : '';
             }
 
-            document.getElementById('scoreAtividadeText').textContent = atividadeNome;
-            document.getElementById('scoreFaixaEtaria').textContent = "🔢 " + faixaEtariaNome;
             document.getElementById('zoneSmall').textContent = zone;
             document.getElementById('cardTempo').textContent = displayTempo;
 
@@ -2294,22 +2320,5 @@ document.getElementById('calcForm').onsubmit = function (e) {
 document.getElementById('calcForm').addEventListener('submit', function (event) {
     event.preventDefault();
 
-    const nome = document.getElementById('nome').value.trim();
-    const scoreNome = document.getElementById('scoreNome');
-
-    if (nome) {
-        scoreNome.textContent = nome;
-        scoreNome.style.display = 'block';
-    } else {
-        scoreNome.style.display = 'none';
-    }
 });
 
-document.getElementById('toggleNome').addEventListener('change', function (event) {
-    const scoreNome = document.getElementById('scoreNome');
-    if (event.target.checked) {
-        scoreNome.style.display = 'block';
-    } else {
-        scoreNome.style.display = 'none';
-    }
-});
