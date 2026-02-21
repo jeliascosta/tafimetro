@@ -655,11 +655,11 @@ input:checked+.slider:before {
 
 /* Classe unificada para spans decorativos do card */
 .card-decoration {
-position: absolute;
-height: 30px;
-width: auto;
-top: 50%;
-transform: translateY(-57%);
+/* position: absolute; */
+/* height: 30px; */
+/* width: auto; */
+/* top: 50%; */
+/* transform: translateY(-57%); */
 font-size: 22px;
 }
 
