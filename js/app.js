@@ -2089,7 +2089,7 @@ function prepararCardClonado(srcCard, clone) {
         }
     } catch (_) { }
 
-    // Distribui emojis somente no clone e não para nota 100
+    // Distribui emojis no card clonado (não afeta o card original) e ignora quando a nota é 100
     // try { distribuirEmojisDaZonaNoCard(clone); } catch (_) { }
 
     return clone;
