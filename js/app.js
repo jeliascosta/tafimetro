@@ -1037,7 +1037,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (scoreNomeEl) {
                 const nome = document.getElementById('nome').value.trim();
                 scoreNomeEl.style.color = textColor;
-                scoreNomeEl.textContent = nome? `👤 ${nome}` : '';
+                scoreNomeEl.textContent = nome ? `👤 ${nome}` : '';
             }
 
             document.getElementById('zoneSmall').textContent = zone;
@@ -1066,6 +1066,24 @@ document.addEventListener('DOMContentLoaded', function () {
             // Sincroniza o card no compositor com o novo conteúdo e largura
             if (typeof atualizarCardOverlayDoShareCard === 'function') atualizarCardOverlayDoShareCard();
             if (typeof recalibrarLarguraOverlayDaOrigem === 'function') recalibrarLarguraOverlayDaOrigem();
+
+            atualizarVisibilidadeToggleNome();
+
+            if (atividade === 'natacao50' || atividade === 'natacao100') {
+                const togglePace = document.getElementById('togglePace');
+                const paceContainers = document.querySelectorAll('.meta-item');
+
+                // Aplicar preferência do Pace
+                togglePace.checked = false;
+                paceContainers.forEach((container, index) => {
+                    if (index === 1) { // Segundo meta-item é o Pace
+                        console.log('Escopndendo Pace para natação');
+                        container.style.display = 'none';
+                    }
+                });
+            }
+            else console.log("Atividade não é natação, mantendo Pace visível", atividade);
+
         } catch (error) {
             const shareCardEl = document.getElementById('shareCard');
             if (shareCardEl)
@@ -1073,7 +1091,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
             document.getElementById('nota').innerHTML = `<div style="color: red;">Erro: ${error.message}</div>`;
         }
-
     });
 
     preencherTabelaReferencia();
@@ -1446,16 +1463,6 @@ function atualizarVisibilidadeToggleNome() {
         toggleNomeContainer.style.display = 'none';
     }
 }
-
-// Adicionar listener para o botão Desbrave
-const desbraveButton = document.querySelector('button[type="submit"]');
-if (desbraveButton) {
-    desbraveButton.addEventListener('click', function (event) {
-        atualizarVisibilidadeToggleNome();
-    });
-}
-
-// Adicionar listener para o toggle de mostrar/ocultar Pace (removido junto com hustle)
 
 // Adicionar listeners para idade e sexo atualizarem o título do gráfico
 document.addEventListener('DOMContentLoaded', function () {
