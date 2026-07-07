@@ -921,8 +921,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 'natacao50': 'Natação | 50m',
                 'natacao100': 'Natação | 100m',
                 'natacao450': 'Natação | 450m',
-                'abdominalPrancha': 'Abdominal | Prancha',
-                'abdominalPranchaFN': 'Abdominal | Prancha (FN)',
+                'abdominalPrancha': 'Prancha Isométrica',
+                'abdominalPranchaFN': 'Prancha Isométrica (FN)',
                 'caminhada4800': 'Caminhada | 4.8km'
             };
             const atividadeNome = nomesAtividade[atividade] || 'Atividade';
