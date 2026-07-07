@@ -398,7 +398,7 @@ tr:hover {
     font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
     text-align: center;
     position: relative;
-    min-width: 180px; 
+    min-width: 180px;
     /* para posicionar cantos absolutos */
 }
 
@@ -427,7 +427,7 @@ tr:hover {
 .share-card .share-top .main .rev {
     position: absolute;
     left: 100%;
-    top: 50%;
+    top: 42%;
     transform: translate(3px, -10%);
     /* distância horizontal + vertical centralizado */
     font-size: 0.45em;
@@ -658,12 +658,12 @@ input:checked+.slider:before {
 
 /* Classe unificada para spans decorativos do card */
 .card-decoration {
-/* position: absolute; */
-/* height: 30px; */
-/* width: auto; */
-/* top: 50%; */
-/* transform: translateY(-57%); */
-font-size: 22px;
+    /* position: absolute; */
+    /* height: 30px; */
+    /* width: auto; */
+    /* top: 50%; */
+    /* transform: translateY(-57%); */
+    font-size: 22px;
 }
 
 /* responsividade: empilha no mobile

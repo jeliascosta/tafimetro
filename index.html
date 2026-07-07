@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TAFímetro</title>
-    <meta name="description" content="Insira os dados do seu TAF/treino e desbrave seu card!" >
+    <meta name="description" content="Insira os dados do seu TAF/treino e desbrave seu card!">
     <link rel="stylesheet" href="css/styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&display=swap" rel="stylesheet">
     <!-- Google tag (gtag.js) -->
@@ -29,18 +29,36 @@
 
 <body>
     <div class="container">
-        <h1 style="margin-top: 5px;">⚓📊 TAFímetro <span id="tituloEmojis">🏃🏻‍♀️🏊</span></h1>
+        <h1 style="margin-top: 5px; margin-bottom: 2px;">⚓📊 TAFímetro <span id="tituloEmojis">🏃🏻‍♀️🏊</span></h1>
+        <div
+            style="text-align: center; font-family: 'Black Ops One', sans-serif; font-size: 0.7rem; color: #555; margin-top: -2px; margin-bottom: 5px; letter-spacing: 1px;">
+            REV2</div>
         <p class="instrucao-frase">📈 Insira os dados do seu TAF/treino e desbrave seu card!</p>
         <form id="calcForm">
             <div style="display: flex; gap: 8px; align-items: flex-end;">
+                <div style="flex: 0 0 110px;">
+                    <label for="anoBase" style="white-space: nowrap;">📅 Ano-base:</label>
+                    <select id="anoBase" required style="width: 100%; height: 38px;">
+                        <option value="2025">2025</option>
+                        <option value="2026">2026</option>
+                        <option value="2027">2027</option>
+                        <option value="2028">2028</option>
+                        <option value="2029">2029</option>
+                        <option value="2030">2030</option>
+                        <option value="2031">2031</option>
+                    </select>
+                </div>
                 <div style="flex: 1;">
                     <label for="atividade">🏃 Teste:</label>
                     <select id="atividade" required style="width: 100%; height: 38px;">
                         <option value="corrida2400">Corrida 2.4km</option>
-                        <option value="corrida3200">Corrida 3.2km</option>
+                        <option value="corrida3200">Corrida 3.2km (FN)</option>
                         <option value="natacao50" selected>Natação 50m</option>
-                        <option value="natacao100">Natação 100m</option>
+                        <option value="natacao100">Natação 100m (FN)</option>
+                        <option value="natacao450">Natação 450m</option>
                         <option value="caminhada4800">Caminhada 4.8km</option>
+                        <option value="abdominalPrancha">Abdominal Prancha Isométrica</option>
+                        <option value="abdominalPranchaFN">Abdominal Prancha Isométrica (FN)</option>
                     </select>
                 </div>
             </div>
@@ -193,7 +211,9 @@
                     <input type="number" id="idade" value="35" min="18" required style="width: 90%;">
                 </div>
                 <div style="width: 150px;">
-                    <label for="calcularMaior100" style="font-size: 0.8em; margin-bottom: 4px; display: block;text-align: center;">🚀 *Calcular nota > 100?</label>
+                    <label for="calcularMaior100"
+                        style="font-size: 0.8em; margin-bottom: 4px; display: block;text-align: center;">🚀 *Calcular
+                        nota > 100?</label>
                     <select id="calcularMaior100"
                         style="padding: 4px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 0.9rem;">
                         <option value="nao">Não</option>
@@ -203,7 +223,8 @@
             </div>
 
             <div>
-                <label for="nome" style="margin-bottom: 4px; display: block;">📝 Nome <span style="font-size: 0.8em; color: #888;">(opcional):</span></label>
+                <label for="nome" style="margin-bottom: 4px; display: block;">📝 Nome <span
+                        style="font-size: 0.8em; color: #888;">(opcional):</span></label>
                 <input type="text" id="nome" name="nome" placeholder="1T (EN) Na Marca" style="width: 95%;">
             </div>
 
@@ -215,11 +236,14 @@
         <div id="resultado">
             <div id="nota">
                 <div class="share-card" id="shareCard" style="display: none;">
-                    <div class="share-top" style="position: relative; text-align: center; display: flex; justify-content: center; align-items: center;">
-                        <span class="card-decoration" style="position: absolute; left: calc(50% - 63.5px); height: 30px; width: auto; top: 50%; transform: translateY(-50%);">⏱️</span>
+                    <div class="share-top"
+                        style="position: relative; text-align: center; display: flex; justify-content: center; align-items: center;">
+                        <span class="card-decoration"
+                            style="position: absolute; left: calc(50% - 63.5px); height: 30px; width: auto; top: 50%; transform: translateY(-50%);">⏱️</span>
                         <div>
-                            <span class="main">TAFímetro<span class="rev">CGCFN<br/>108 REV1</span></span>
-                            <div class="card-date" id="cardDate" style="font-size:.7rem;font-weight:lighter;opacity:.8;margin-top: 0px;">
+                            <span class="main">TAFímetro<span class="rev">CGCFN<br />108 REV1</span></span>
+                            <div class="card-date" id="cardDate"
+                                style="font-size:.7rem;font-weight:lighter;opacity:.8;margin-top: 0px;">
                             </div>
                         </div>
                     </div>
@@ -229,7 +253,9 @@
                             id="scoreAtividadeText"></span>
                     </div>
                     <div class="score-big" id="scoreBig"></div>
-                    <div id="scoreNome" style="display: flex; justify-content: center; /*font-family: 'Inter', sans-serif; */font-size: 0.8rem; font-weight: 600; text-align: center; color: #888; padding: 0px 10px;margin: 4px 0px 0px 0px;"></div>
+                    <div id="scoreNome"
+                        style="display: flex; justify-content: center; /*font-family: 'Inter', sans-serif; */font-size: 0.8rem; font-weight: 600; text-align: center; color: #888; padding: 0px 10px;margin: 4px 0px 0px 0px;">
+                    </div>
                     <div id="scoreFaixaEtaria"
                         style="display: flex; justify-content: center; /*font-family: 'Inter', sans-serif; */font-size: 0.8rem; font-weight: 600; text-align: center; color: #888; padding: 0px 10px;margin: 4px 0px 0px 0px;">
                     </div>
@@ -408,7 +434,8 @@
     <footer>
         <sub>TAFímetro | <a href="mailto:jonathan.elias@marinha.mil.br">jonathan.elias@marinha.mil.br</a></sub>
         <sub>Publicação base: CGCFN 108 REV1 (2021)</sub>
-        <sub style="white-space: break-spaces;margin-top:10px">* Estimativa baseada na taxa de variação da nota em função do tempo no intervalo de 90 a 100 pontos do teste selecionado.</sub>
+        <sub style="white-space: break-spaces;margin-top:10px">* Estimativa baseada na taxa de variação da nota em
+            função do tempo no intervalo de 90 a 100 pontos do teste selecionado.</sub>
     </footer>
 
     <!-- Biblioteca para capturar o div como imagem -->
